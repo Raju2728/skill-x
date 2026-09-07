@@ -1,0 +1,257 @@
+.learning-page {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.learning-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.learning-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+}
+
+.learning-subtitle {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  margin-top: 2px;
+}
+
+.learning-stats-banner {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-6);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  align-items: center;
+}
+
+.level-card-left {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.level-badge-wrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.level-badge-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.level-num {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.xp-text {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.level-progress-track {
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.level-progress-fill {
+  height: 100%;
+  background: var(--accent-gradient);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+.learning-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.learning-stat-box {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+}
+
+.stat-num {
+  font-size: var(--text-lg);
+  font-weight: var(--font-bold);
+}
+
+.stat-lbl {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.section-title-sm {
+  font-size: var(--text-base);
+  font-weight: var(--font-semibold);
+}
+
+.goals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-5);
+}
+
+.goal-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  background: var(--bg-secondary);
+}
+
+.goal-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.goal-title-col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.goal-title {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+}
+
+.goal-pct-circle {
+  font-size: var(--text-xs);
+  font-weight: var(--font-bold);
+  color: var(--accent-primary);
+  background: var(--accent-primary-muted);
+  padding: 4px 8px;
+  border-radius: var(--radius-md);
+}
+
+.goal-bar-track {
+  height: 6px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.goal-bar-fill {
+  height: 100%;
+  background: var(--accent-primary);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-base);
+}
+
+.goal-bar-fill-done {
+  background: var(--success);
+}
+
+.goal-milestones-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.milestones-heading {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  font-weight: var(--font-semibold);
+}
+
+.milestone-item-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  text-align: left;
+  cursor: pointer;
+  padding: 4px 0;
+  transition: color var(--transition-fast);
+}
+
+.milestone-item-btn:hover {
+  color: var(--text-primary);
+}
+
+.milestone-done .milestone-title {
+  text-decoration: line-through;
+  color: var(--text-tertiary);
+}
+
+.goals-empty-state {
+  text-align: center;
+  padding: var(--space-16) var(--space-4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+}
+
+.goals-empty-state h3 {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  margin-bottom: var(--space-1);
+}
+
+.goals-empty-state p {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.new-goal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.milestones-inputs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.add-milestone-link {
+  background: none;
+  border: none;
+  color: var(--accent-primary);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  text-align: left;
+  margin-top: var(--space-1);
+}
+
+@media (max-width: 768px) {
+  .learning-stats-banner {
+    grid-template-columns: 1fr;
+  }
+}

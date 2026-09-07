@@ -1,0 +1,108 @@
+.voice-call-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 17, 23, 0.95);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--z-call);
+}
+
+.voice-call-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 380px;
+  padding: var(--space-8);
+}
+
+.voice-call-encryption {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: var(--radius-full);
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-bottom: var(--space-8);
+}
+
+.voice-call-avatar-wrap {
+  position: relative;
+  margin-bottom: var(--space-6);
+}
+
+.voice-audio-ripple {
+  position: absolute;
+  inset: -12px;
+  border-radius: 50%;
+  border: 2px solid var(--accent-primary);
+  opacity: 0.4;
+  animation: ripple 2s infinite;
+}
+
+.voice-call-name {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+  margin-bottom: var(--space-1);
+}
+
+.voice-call-status {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+  margin-bottom: var(--space-12);
+}
+
+.voice-call-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+}
+
+.voice-ctrl-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.voice-ctrl-btn:hover {
+  background: var(--bg-hover);
+}
+
+.voice-ctrl-active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+}
+
+.voice-ctrl-end {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--danger);
+  color: white;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 0 24px rgba(239, 68, 68, 0.4);
+  transition: transform var(--transition-fast);
+}
+
+.voice-ctrl-end:hover {
+  transform: scale(1.08);
+}

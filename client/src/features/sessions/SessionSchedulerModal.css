@@ -1,0 +1,62 @@
+.scheduler-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.scheduler-datetime-row {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.scheduler-input,
+.scheduler-select {
+  width: 100%;
+  padding: 10px 14px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.scheduler-input:focus,
+.scheduler-select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.meeting-mode-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+.mode-option-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.mode-option-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.mode-option-active {
+  background: var(--accent-primary-muted);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
+  font-weight: var(--font-semibold);
+}

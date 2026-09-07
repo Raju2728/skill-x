@@ -1,0 +1,58 @@
+.profile-edit-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.edit-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+.edit-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.edit-page-title {
+  font-size: var(--text-2xl);
+  font-weight: var(--font-bold);
+}
+
+.edit-card-wrapper {
+  padding: var(--space-6);
+  border-radius: var(--radius-xl);
+}
+
+.edit-tab-panel {
+  padding-top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.edit-avatar-section {
+  display: flex;
+  align-items: center;
+  gap: var(--space-6);
+  background: var(--bg-tertiary);
+  padding: var(--space-4) var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+}
+
+.edit-avatar-inputs {
+  flex: 1;
+}
+
+.edit-form-grid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}

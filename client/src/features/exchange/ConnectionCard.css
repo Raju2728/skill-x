@@ -1,0 +1,141 @@
+.connection-card {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--bg-secondary);
+  transition: all var(--transition-base);
+}
+
+.connection-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.conn-card-header {
+  padding: var(--space-4);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--border);
+}
+
+.conn-partner-meta {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+
+.conn-name-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.conn-name {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+  text-decoration: none;
+}
+
+.conn-name:hover {
+  color: var(--accent-primary);
+}
+
+.conn-stats-chips {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: 4px;
+}
+
+.conn-stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg-tertiary);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.conn-menu-trigger {
+  background: none;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+}
+
+.conn-menu-trigger:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+}
+
+.conn-card-body {
+  padding: var(--space-4);
+  flex: 1;
+}
+
+.conn-skills-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  background: var(--bg-tertiary);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.conn-skill-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.conn-skill-label {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  font-weight: var(--font-semibold);
+}
+
+.conn-skills-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.conn-chip-learn {
+  font-size: 11px;
+  background: var(--accent-primary-muted);
+  color: var(--accent-primary);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.conn-chip-teach {
+  font-size: 11px;
+  background: rgba(124, 92, 191, 0.15);
+  color: var(--accent-secondary);
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.conn-card-footer {
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-tertiary);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
