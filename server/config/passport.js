@@ -37,7 +37,7 @@ module.exports = function configurePassport(passport) {
         email: profile.emails[0].value,
         googleId: profile.id,
         avatar: profile.photos?.[0]?.value || '',
-        username: profile.emails[0].value.split('@')[0] + '_' + Date.now().toString(36),
+        username: profile.emails[0].value.split('@')[0].replace(/[^a-zA-Z0-9_]/g, '') + '_' + Date.now().toString(36),
         emailVerified: true,
         status: 'active',
       });
