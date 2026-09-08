@@ -5,7 +5,6 @@
   border: 1px solid var(--border);
   border-radius: var(--radius-xl);
   overflow: hidden;
-  margin: -var(--space-2);
 }
 
 .chat-no-selection {
@@ -82,8 +81,33 @@
   gap: var(--space-2);
 }
 
+/* =============================
+   Mobile Chat Layout
+   ============================= */
 @media (max-width: 768px) {
   .chat-page-layout {
-    height: calc(100vh - 120px);
+    /* Full height minus bottom nav */
+    height: calc(100dvh - 88px);
+    border-radius: var(--radius-lg);
+    border: none;
+    margin: 0 calc(-1 * var(--space-3));
+  }
+
+  /* Mobile: single panel takes full width */
+  .chat-mobile > * {
+    width: 100% !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  /* Hide partner sidebar on mobile (handled in JSX) */
+  .chat-partner-sidebar {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .chat-page-layout {
+    margin: 0 calc(-1 * var(--space-2));
   }
 }

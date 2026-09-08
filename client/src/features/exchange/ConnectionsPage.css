@@ -103,3 +103,25 @@
   max-width: 440px;
   margin: 0 auto;
 }
+
+@media (max-width: 768px) {
+  .connections-title {
+    font-size: var(--text-xl);
+  }
+
+  .connections-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .connections-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .conn-tab {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+}

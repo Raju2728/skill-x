@@ -26,7 +26,18 @@
   border: none;
   color: var(--text-secondary);
   cursor: pointer;
-  display: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.chat-back-btn:hover {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
 }
 
 .chat-partner-info {
@@ -143,4 +154,36 @@
 .typing-text {
   font-size: 11px;
   color: var(--text-tertiary);
+}
+
+/* =============================
+   Mobile ChatWindow
+   ============================= */
+@media (max-width: 768px) {
+  .chat-window-panel {
+    width: 100%;
+    flex: 1;
+  }
+
+  .chat-back-btn {
+    display: flex;
+  }
+
+  .chat-window-header {
+    padding: var(--space-3) var(--space-3);
+  }
+
+  .chat-messages-area {
+    padding: var(--space-3) var(--space-3);
+  }
+
+  .chat-encryption-banner {
+    font-size: 10px;
+    padding: 4px var(--space-2);
+  }
+
+  .chat-action-btn {
+    width: 40px;
+    height: 40px;
+  }
 }

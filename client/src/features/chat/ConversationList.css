@@ -154,3 +154,27 @@
   padding: 1px 6px;
   border-radius: var(--radius-full);
 }
+
+/* =============================
+   Mobile ConversationList
+   ============================= */
+@media (max-width: 768px) {
+  .conversation-list-panel {
+    width: 100%;
+    flex: 1;
+    border-right: none;
+  }
+
+  .conv-item {
+    padding: var(--space-4) var(--space-3);
+    min-height: 68px;
+  }
+
+  .conv-item-name {
+    font-size: var(--text-sm);
+  }
+
+  .conv-last-msg {
+    font-size: var(--text-xs);
+  }
+}

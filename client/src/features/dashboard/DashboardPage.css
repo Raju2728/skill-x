@@ -81,6 +81,16 @@
 }
 
 @media (max-width: 768px) {
+  .dashboard-title { font-size: var(--text-2xl); }
   .dashboard-stats { grid-template-columns: repeat(2, 1fr); }
   .dashboard-grid { grid-template-columns: 1fr; }
+  .dashboard-header { margin-bottom: var(--space-5); }
+}
+
+@media (max-width: 480px) {
+  .dashboard-title { font-size: var(--text-xl); }
+  .dashboard-stats { gap: var(--space-3); }
+  .stat-card { padding: var(--space-3); }
+  .stat-icon { width: 36px; height: 36px; }
+  .stat-value { font-size: var(--text-xl); }
 }

@@ -209,11 +209,25 @@
   }
   .profile-title-block {
     align-items: center;
+    min-width: 0;
   }
   .profile-name-row {
     justify-content: center;
   }
   .profile-meta-row {
     justify-content: center;
+  }
+  .profile-cta-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  .profile-cta-group > * {
+    width: 100%;
+  }
+  .profile-banner {
+    padding: var(--space-5);
+  }
+  .profile-name {
+    font-size: var(--text-xl);
   }
 }
