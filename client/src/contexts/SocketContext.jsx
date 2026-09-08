@@ -36,9 +36,18 @@ export function SocketProvider({ children }) {
     // Initialize user encryption keys in background
     keyManager.initializeKeys(user._id).catch(console.error);
 
+    // Read JWT from first-party cookie so we can pass it explicitly
+    // in the handshake — required for cross-origin production deployments
+    // where third-party cookies are blocked by browsers.
+    function getTokenCookie() {
+      const match = document.cookie.match(/(^| )token=([^;]+)/);
+      return match ? match[2] : null;
+    }
+
     // Connect to Socket.IO server
     const s = io(SOCKET_URL, {
       withCredentials: true,
+      auth: { token: getTokenCookie() },
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
