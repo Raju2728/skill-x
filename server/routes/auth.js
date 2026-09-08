@@ -67,6 +67,7 @@ router.post('/register', [
     res.status(201).json({
       message: 'Registration successful',
       user: user.toJSON(),
+      token,
     });
   } catch (error) {
     next(error);
@@ -120,6 +121,7 @@ router.post('/login', [
     res.json({
       message: 'Login successful',
       user: user.toJSON(),
+      token,
     });
   } catch (error) {
     next(error);
@@ -163,13 +165,23 @@ router.get('/google',
 
 router.get('/google/callback',
   requireGoogleOAuth,
-  passport.authenticate('google', { session: false, failureRedirect: '/login?error=google_auth_failed' }),
+  (req, res, next) => {
+    const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
+    passport.authenticate('google', {
+      session: false,
+      failureRedirect: `${frontendUrl}/login?error=google_auth_failed`,
+    })(req, res, next);
+  },
   (req, res) => {
     const token = generateToken(req.user._id);
     setTokenCookie(res, token);
-    // Redirect to the frontend dashboard (CLIENT_URL already has the Vercel domain in prod)
+    // Redirect to the frontend dashboard.
+    // In production the frontend (Vercel) and backend (Render) are on different
+    // domains. Modern browsers silently block third-party cookies even with
+    // SameSite=None. So we also pass the token as a URL query parameter; the
+    // frontend extracts it and stores it as a first-party cookie on its own domain.
     const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-    res.redirect(`${frontendUrl}/app/dashboard`);
+    res.redirect(`${frontendUrl}/app/dashboard?token=${token}`);
   }
 );
 

@@ -23,6 +23,30 @@ const api = axios.create({
   },
 });
 
+// ---------------------------------------------------------------------------
+// Request interceptor — attach JWT from first-party cookie as Bearer token.
+//
+// In production the frontend (Vercel) and backend (Render) are on different
+// domains. Even with withCredentials: true, browsers block cross-origin
+// cookies ("third-party cookie deprecation"). To work around this, the OAuth
+// callback passes the JWT via URL query param, and AuthContext stores it as a
+// first-party cookie. This interceptor reads that cookie and sends it as a
+// standard Authorization header so the backend's requireAuth middleware can
+// verify it.
+// ---------------------------------------------------------------------------
+function getCookie(name) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? match[2] : null;
+}
+
+api.interceptors.request.use((config) => {
+  const token = getCookie('token');
+  if (token && !config.headers.Authorization) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 // Response interceptor for auth errors
 api.interceptors.response.use(
   (response) => response,
