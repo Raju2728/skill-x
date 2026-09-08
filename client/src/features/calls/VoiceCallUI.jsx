@@ -8,11 +8,12 @@ export default function VoiceCallUI({
   partner,
   onEndCall,
   isIncoming = false,
+  callId = null,
 }) {
   const [isMuted, setIsMuted] = useState(false);
   const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
-  const [callStatus, setCallStatus] = useState('Connecting...');
+  const [callStatus, setCallStatus] = useState(isIncoming ? 'Connecting...' : 'Ringing...');
 
   const audioRef = useRef(null);
 
@@ -20,30 +21,35 @@ export default function VoiceCallUI({
     let timer;
     async function startCall() {
       try {
-        setCallStatus('Ringing...');
-
         webRTCManager.onRemoteStream = (stream) => {
           setCallStatus('Connected');
           if (audioRef.current) {
             audioRef.current.srcObject = stream;
             audioRef.current.play().catch(console.error);
           }
-          // Start timer
-          timer = setInterval(() => {
-            setCallDuration(prev => prev + 1);
-          }, 1000);
+          if (!timer) {
+            timer = setInterval(() => {
+              setCallDuration(prev => prev + 1);
+            }, 1000);
+          }
         };
 
         webRTCManager.onCallEnd = () => {
           onEndCall?.();
         };
 
+        webRTCManager.onConnectionStateChange = (state) => {
+          if (state === 'connected') setCallStatus('Connected');
+          if (state === 'disconnected') setCallStatus('Reconnecting...');
+          if (state === 'failed') setCallStatus('Call failed');
+        };
+
         if (!isIncoming) {
-          await webRTCManager.initiateCall(partner._id, false);
+          await webRTCManager.initiateCall(partner._id, false, callId);
         }
       } catch (err) {
         console.error('Call initialization failed:', err);
-        setCallStatus('Connection failed');
+        setCallStatus('Microphone permission failed');
       }
     }
 

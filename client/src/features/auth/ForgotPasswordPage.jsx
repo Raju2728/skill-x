@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, ArrowLeft, Sparkles, CheckCircle } from 'lucide-react';
+import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import { authAPI } from '../../services/api';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import Logo from '../../components/ui/Logo';
 import './AuthPages.css';
 
 export default function ForgotPasswordPage() {
@@ -38,9 +39,8 @@ export default function ForgotPasswordPage() {
 
       <div className="auth-container animate-fade-in-up">
         <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <Sparkles size={24} />
-            <span>Skill X</span>
+          <Link to="/" className="auth-logo" aria-label="Skill X Home">
+            <Logo size="lg" />
           </Link>
           {sent ? (
             <>

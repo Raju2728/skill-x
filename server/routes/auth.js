@@ -1,18 +1,24 @@
 const express = require('express');
+const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const passport = require('passport');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { requireAuth } = require('../middleware/auth');
+const { JWT_SECRET, generateToken, verifyToken } = require('../config/jwt');
 
 const router = express.Router();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret';
-const JWT_EXPIRES = process.env.JWT_EXPIRES_IN || '7d';
-
-function generateToken(userId) {
-  return jwt.sign({ userId }, JWT_SECRET, { expiresIn: JWT_EXPIRES });
-}
+// Ephemeral single-use OAuth authorization codes (TTL 60s)
+const oauthExchangeCodes = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [code, data] of oauthExchangeCodes.entries()) {
+    if (data.expiresAt < now) {
+      oauthExchangeCodes.delete(code);
+    }
+  }
+}, 60000);
 
 function setTokenCookie(res, token) {
   const isProduction = process.env.NODE_ENV === 'production';
@@ -175,15 +181,54 @@ router.get('/google/callback',
   (req, res) => {
     const token = generateToken(req.user._id);
     setTokenCookie(res, token);
-    // Redirect to the frontend dashboard.
-    // In production the frontend (Vercel) and backend (Render) are on different
-    // domains. Modern browsers silently block third-party cookies even with
-    // SameSite=None. So we also pass the token as a URL query parameter; the
-    // frontend extracts it and stores it as a first-party cookie on its own domain.
     const frontendUrl = process.env.CLIENT_URL || 'http://localhost:5173';
-    res.redirect(`${frontendUrl}/app/dashboard?token=${token}`);
+
+    // Issue ephemeral single-use authorization code for frontend exchange
+    // This prevents exposing raw JWT in browser history, logs, or Referrer headers
+    const exchangeCode = crypto.randomBytes(32).toString('hex');
+    oauthExchangeCodes.set(exchangeCode, {
+      token,
+      user: {
+        _id: req.user._id,
+        name: req.user.name,
+        username: req.user.username,
+        email: req.user.email,
+        avatar: req.user.avatar,
+        role: req.user.role,
+      },
+      expiresAt: Date.now() + 60000, // 60-second TTL
+    });
+
+    res.redirect(`${frontendUrl}/app/dashboard?code=${exchangeCode}`);
   }
 );
+
+// Secure exchange endpoint for single-use OAuth authorization codes
+router.post('/oauth-exchange', (req, res) => {
+  const { code } = req.body;
+  if (!code || typeof code !== 'string') {
+    return res.status(400).json({ message: 'Authorization code is required' });
+  }
+
+  const exchangeData = oauthExchangeCodes.get(code);
+  if (!exchangeData) {
+    return res.status(400).json({ message: 'Invalid or expired authorization code' });
+  }
+
+  if (Date.now() > exchangeData.expiresAt) {
+    oauthExchangeCodes.delete(code);
+    return res.status(400).json({ message: 'Authorization code expired' });
+  }
+
+  // Single-use: delete immediately upon redemption
+  oauthExchangeCodes.delete(code);
+  setTokenCookie(res, exchangeData.token);
+
+  res.json({
+    token: exchangeData.token,
+    user: exchangeData.user,
+  });
+});
 
 // Forgot password
 router.post('/forgot-password', [
@@ -198,10 +243,9 @@ router.post('/forgot-password', [
 
     if (!user) return;
 
-    // In production, send email with reset link
-    // For dev, log the token
+    // Generate reset token (never logged to console in any environment)
     const resetToken = jwt.sign({ userId: user._id, type: 'reset' }, JWT_SECRET, { expiresIn: '1h' });
-    console.log(`[DEV] Password reset token for ${email}: ${resetToken}`);
+    // In production, dispatch via configured email transport
   } catch (error) {
     next(error);
   }
@@ -217,7 +261,7 @@ router.post('/reset-password/:token', [
       return res.status(400).json({ message: errors.array()[0].msg });
     }
 
-    const decoded = jwt.verify(req.params.token, JWT_SECRET);
+    const decoded = verifyToken(req.params.token);
     if (decoded.type !== 'reset') {
       return res.status(400).json({ message: 'Invalid reset token' });
     }

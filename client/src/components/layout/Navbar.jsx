@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, Sparkles, UserCircle } from 'lucide-react';
+import { ArrowRight, UserCircle } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import Avatar from '../ui/Avatar';
+import Logo from '../ui/Logo';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -13,11 +14,8 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <Link to="/" className="navbar-brand">
-          <div className="navbar-logo">
-            <Sparkles size={22} />
-          </div>
-          <span className="navbar-name">Skill X</span>
+        <Link to="/" className="navbar-brand" aria-label="Skill X Home">
+          <Logo size="md" />
         </Link>
 
         <div className="navbar-links md-hidden-flex">

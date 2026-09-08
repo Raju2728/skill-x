@@ -1,0 +1,62 @@
+.skillx-logo-wrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  user-select: none;
+  line-height: 1;
+}
+
+.skillx-logo-img {
+  display: block;
+  object-fit: contain;
+  border-radius: 8px;
+  filter: drop-shadow(0 2px 8px rgba(99, 102, 241, 0.25));
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), filter 0.25s ease;
+}
+
+.skillx-logo-wrapper:hover .skillx-logo-img {
+  transform: scale(1.05);
+  filter: drop-shadow(0 4px 14px rgba(99, 102, 241, 0.45));
+}
+
+.skillx-logo-text {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 50%, #94a3b8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Sizes */
+.skillx-logo-sm .skillx-logo-img {
+  width: 24px;
+  height: 24px;
+}
+.skillx-logo-sm .skillx-logo-text {
+  font-size: 0.95rem;
+}
+
+.skillx-logo-md .skillx-logo-img {
+  width: 34px;
+  height: 34px;
+}
+.skillx-logo-md .skillx-logo-text {
+  font-size: 1.25rem;
+}
+
+.skillx-logo-lg .skillx-logo-img {
+  width: 44px;
+  height: 44px;
+}
+.skillx-logo-lg .skillx-logo-text {
+  font-size: 1.5rem;
+}
+
+.skillx-logo-xl .skillx-logo-img {
+  width: 58px;
+  height: 58px;
+}
+.skillx-logo-xl .skillx-logo-text {
+  font-size: 1.85rem;
+}

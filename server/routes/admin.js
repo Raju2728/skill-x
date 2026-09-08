@@ -6,6 +6,7 @@ const Session = require('../models/Session');
 const Connection = require('../models/Connection');
 const Report = require('../models/Report');
 const AuditLog = require('../models/AuditLog');
+const { escapeRegex } = require('../utils/sanitize');
 const router = express.Router();
 
 router.use(requireAuth, requireAdmin);
@@ -76,10 +77,11 @@ router.get('/users', async (req, res, next) => {
     const filter = {};
 
     if (search) {
+      const safeSearch = escapeRegex(search.trim());
       filter.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { email: { $regex: search, $options: 'i' } },
-        { username: { $regex: search, $options: 'i' } },
+        { name: { $regex: safeSearch, $options: 'i' } },
+        { email: { $regex: safeSearch, $options: 'i' } },
+        { username: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 
@@ -129,7 +131,7 @@ router.get('/skills', async (req, res, next) => {
   try {
     const { search, category } = req.query;
     const filter = {};
-    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (search) filter.name = { $regex: escapeRegex(search.trim()), $options: 'i' };
     if (category) filter.category = category;
 
     const skills = await Skill.find(filter).sort('-popularity');

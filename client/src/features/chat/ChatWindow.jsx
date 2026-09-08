@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Phone, Video, Calendar, MoreVertical, ShieldCheck,
   Sparkles, Lock, ArrowLeft
@@ -13,6 +13,8 @@ import Button from '../../components/ui/Button';
 import MessageBubble from './MessageBubble';
 import MessageInput from './MessageInput';
 import SecurityIndicator from './SecurityIndicator';
+import VoiceCallUI from '../calls/VoiceCallUI';
+import VideoCallUI from '../calls/VideoCallUI';
 import { PageLoader } from '../../components/ui/Spinner';
 import './ChatWindow.css';
 
@@ -23,14 +25,23 @@ export default function ChatWindow({
   const { user } = useAuth();
   const { socket, isUserOnline } = useSocket();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isPartnerTyping, setIsPartnerTyping] = useState(false);
+  const [activeCall, setActiveCall] = useState(location.state?.activeCall || null);
   const messagesEndRef = useRef(null);
 
   const partner = conversation.partner;
   const isOnline = isUserOnline(partner?._id);
+
+  // Sync activeCall from navigation state if accepted from modal
+  useEffect(() => {
+    if (location.state?.activeCall) {
+      setActiveCall(location.state.activeCall);
+    }
+  }, [location.state?.activeCall]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -163,12 +174,21 @@ export default function ChatWindow({
     const payloadText = text || (file ? `Sent file: ${file.name}` : '');
 
     // 1. Encrypt payload client-side using E2EE
-    const { ciphertext, nonce } = await e2eeService.encryptMessage(
-      conversation._id,
-      user._id,
-      partner._id,
-      payloadText
-    );
+    let ciphertext, nonce;
+    try {
+      const encrypted = await e2eeService.encryptMessage(
+        conversation._id,
+        user._id,
+        partner._id,
+        payloadText
+      );
+      ciphertext = encrypted.ciphertext;
+      nonce = encrypted.nonce;
+    } catch (encryptErr) {
+      console.error('Failed to encrypt message:', encryptErr);
+      alert('Could not encrypt message using End-to-End Encryption. Please ensure recipient public keys are active.');
+      return;
+    }
 
     const tempTimestamp = new Date().toISOString();
 
@@ -232,7 +252,15 @@ export default function ChatWindow({
   };
 
   const startCall = (callType) => {
+    const callId = `call_${Date.now()}`;
+    setActiveCall({
+      callId,
+      callType,
+      isIncoming: false,
+      partner,
+    });
     socket?.emit('call:request', {
+      callId,
       recipientId: partner._id,
       callType,
       conversationId: conversation._id,
@@ -355,6 +383,26 @@ export default function ChatWindow({
         onTypingStart={handleTypingStart}
         onTypingStop={handleTypingStop}
       />
+
+      {/* 1-on-1 Voice Call UI */}
+      {activeCall && activeCall.callType === 'voice' && (
+        <VoiceCallUI
+          partner={partner}
+          isIncoming={activeCall.isIncoming}
+          callId={activeCall.callId}
+          onEndCall={() => setActiveCall(null)}
+        />
+      )}
+
+      {/* 1-on-1 Video Call UI */}
+      {activeCall && activeCall.callType === 'video' && (
+        <VideoCallUI
+          partner={partner}
+          isIncoming={activeCall.isIncoming}
+          callId={activeCall.callId}
+          onEndCall={() => setActiveCall(null)}
+        />
+      )}
     </div>
   );
 }

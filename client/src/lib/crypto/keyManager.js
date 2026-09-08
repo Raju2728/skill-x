@@ -1,4 +1,12 @@
-import { generateECDHKeyPair, exportJWK, importPublicJWK } from './cryptoUtils';
+import {
+  generateECDHKeyPair,
+  generateSigningKeyPair,
+  signData,
+  verifySignature,
+  exportJWK,
+  importPublicJWK,
+  importPublicSigningJWK,
+} from './cryptoUtils';
 import { keysAPI } from '../../services/api';
 
 const DB_NAME = 'SkillX_KeyStore';
@@ -51,7 +59,7 @@ class KeyManager {
   }
 
   /**
-   * Ensure user's identity keys are generated and registered on backend
+   * Ensure user's identity keys and cryptographic pre-keys are generated and registered on backend
    */
   async initializeKeys(userId) {
     const existingIdentity = await this.getItem(`identity_${userId}`);
@@ -60,17 +68,26 @@ class KeyManager {
       return existingIdentity;
     }
 
-    // Generate new Identity Key Pair
+    // Generate Identity Key Pair (ECDH for key agreement)
     const identityKeyPair = await generateECDHKeyPair();
     const identityPublicJWK = await exportJWK(identityKeyPair.publicKey);
     const identityPrivateJWK = await exportJWK(identityKeyPair.privateKey);
+
+    // Generate Signing Key Pair (ECDSA for authenticating pre-keys and identity)
+    const signingKeyPair = await generateSigningKeyPair();
+    const signingPublicJWK = await exportJWK(signingKeyPair.publicKey);
+    const signingPrivateJWK = await exportJWK(signingKeyPair.privateKey);
 
     // Generate Signed Pre-Key
     const signedPreKeyPair = await generateECDHKeyPair();
     const signedPreKeyPublicJWK = await exportJWK(signedPreKeyPair.publicKey);
     const signedPreKeyPrivateJWK = await exportJWK(signedPreKeyPair.privateKey);
 
-    // Generate One-Time Pre-Keys (e.g. 5 pre-keys)
+    // Cryptographically sign the pre-key with the identity signing private key (HIGH-002)
+    const preKeyString = JSON.stringify(signedPreKeyPublicJWK);
+    const signature = await signData(signingKeyPair.privateKey, preKeyString);
+
+    // Generate One-Time Pre-Keys
     const oneTimeKeys = [];
     const oneTimePublicKeys = [];
     for (let i = 1; i <= 5; i++) {
@@ -81,24 +98,28 @@ class KeyManager {
       oneTimePublicKeys.push({ keyId: i, key: JSON.stringify(opkPub) });
     }
 
-    // Save private material in IndexedDB
+    // Save private material safely in client IndexedDB
     await this.setItem(`identity_${userId}`, {
       publicJWK: identityPublicJWK,
       privateJWK: identityPrivateJWK,
+      signingPublicJWK,
+      signingPrivateJWK,
     });
     await this.setItem(`signedPreKey_${userId}`, {
       publicJWK: signedPreKeyPublicJWK,
       privateJWK: signedPreKeyPrivateJWK,
+      signature,
     });
     await this.setItem(`oneTimeKeys_${userId}`, oneTimeKeys);
 
-    // Upload public bundle to backend
+    // Upload authenticated public bundle to backend
     try {
       await keysAPI.uploadBundle({
         identityKey: JSON.stringify(identityPublicJWK),
+        signingKey: JSON.stringify(signingPublicJWK),
         signedPreKey: {
-          key: JSON.stringify(signedPreKeyPublicJWK),
-          signature: 'sig_valid', // in full Signal this is signed with Ed25519
+          key: preKeyString,
+          signature,
           keyId: 1,
         },
         oneTimePreKeys: oneTimePublicKeys,
@@ -110,7 +131,23 @@ class KeyManager {
     return {
       publicJWK: identityPublicJWK,
       privateJWK: identityPrivateJWK,
+      signingPublicJWK,
     };
+  }
+
+  /**
+   * Cryptographically verify a peer's signed pre-key signature (HIGH-002)
+   */
+  async verifyPeerPreKey(signingKeyJWK, preKeyJWK, signature) {
+    try {
+      if (!signingKeyJWK || !signature) return false;
+      const publicSigningKey = await importPublicSigningJWK(signingKeyJWK);
+      const preKeyString = typeof preKeyJWK === 'string' ? preKeyJWK : JSON.stringify(preKeyJWK);
+      return await verifySignature(publicSigningKey, signature, preKeyString);
+    } catch (err) {
+      console.error('Peer pre-key signature verification failed:', err);
+      return false;
+    }
   }
 
   async getIdentityKeyPair(userId) {

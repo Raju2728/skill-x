@@ -5,6 +5,7 @@ const UserSkill = require('../models/UserSkill');
 const Skill = require('../models/Skill');
 const Availability = require('../models/Availability');
 const Review = require('../models/Review');
+const { escapeRegex } = require('../utils/sanitize');
 const router = express.Router();
 
 // Get user public profile with skills, ratings, and availability
@@ -104,7 +105,8 @@ router.post('/skills', requireAuth, async (req, res, next) => {
 
     // If custom skill name is passed, find or create
     if (!targetSkillId && skillName) {
-      let skill = await Skill.findOne({ name: { $regex: new RegExp(`^${skillName.trim()}$`, 'i') } });
+      const safeSkillName = escapeRegex(skillName.trim());
+      let skill = await Skill.findOne({ name: { $regex: new RegExp(`^${safeSkillName}$`, 'i') } });
       if (!skill) {
         skill = await Skill.create({
           name: skillName.trim(),
@@ -165,7 +167,8 @@ router.put('/skills/sync', requireAuth, async (req, res, next) => {
       for (const item of list) {
         let sid = item.skillId || item._id;
         if (!sid && item.name) {
-          let found = await Skill.findOne({ name: { $regex: new RegExp(`^${item.name.trim()}$`, 'i') } });
+          const safeItemName = escapeRegex(item.name.trim());
+          let found = await Skill.findOne({ name: { $regex: new RegExp(`^${safeItemName}$`, 'i') } });
           if (!found) {
             found = await Skill.create({
               name: item.name.trim(),
@@ -261,11 +264,12 @@ router.get('/', optionalAuth, async (req, res, next) => {
     }
 
     if (search) {
+      const safeSearch = escapeRegex(search.trim());
       query.$or = [
-        { name: { $regex: search, $options: 'i' } },
-        { username: { $regex: search, $options: 'i' } },
-        { bio: { $regex: search, $options: 'i' } },
-        { location: { $regex: search, $options: 'i' } },
+        { name: { $regex: safeSearch, $options: 'i' } },
+        { username: { $regex: safeSearch, $options: 'i' } },
+        { bio: { $regex: safeSearch, $options: 'i' } },
+        { location: { $regex: safeSearch, $options: 'i' } },
       ];
     }
 
@@ -274,7 +278,8 @@ router.get('/', optionalAuth, async (req, res, next) => {
     }
 
     if (language) {
-      query.languages = { $in: [new RegExp(language, 'i')] };
+      const safeLanguage = escapeRegex(language.trim());
+      query.languages = { $in: [new RegExp(safeLanguage, 'i')] };
     }
 
     let users = await User.find(query)

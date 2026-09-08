@@ -27,15 +27,14 @@ export function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    // After a Google OAuth redirect the JWT token arrives as a URL query param.
-    // Extract it, store as a first-party cookie (so the browser sends it with
-    // all subsequent API requests to the backend), clean up the URL, then fetch
-    // the user profile.
+    // Check for Google OAuth redirect
     const params = new URLSearchParams(window.location.search);
+    const code = params.get('code');
     const token = params.get('token');
-    if (token) {
-      setFirstPartyCookie('token', token);
-      // Remove the token from the URL without triggering a page reload
+
+    // Clean sensitive params from URL immediately
+    if (code || token) {
+      params.delete('code');
       params.delete('token');
       const cleanUrl =
         window.location.pathname +
@@ -43,7 +42,30 @@ export function AuthProvider({ children }) {
         window.location.hash;
       window.history.replaceState({}, '', cleanUrl);
     }
-    fetchUser();
+
+    if (code) {
+      // Exchange single-use code for secure session (HIGH-011)
+      authAPI.exchangeOAuthCode(code)
+        .then(({ data }) => {
+          if (data.token) {
+            setFirstPartyCookie('token', data.token);
+          }
+          if (data.user) {
+            setUser(data.user);
+          } else {
+            fetchUser();
+          }
+        })
+        .catch((err) => {
+          console.error('OAuth code exchange failed:', err);
+          fetchUser();
+        });
+    } else if (token) {
+      setFirstPartyCookie('token', token);
+      fetchUser();
+    } else {
+      fetchUser();
+    }
   }, [fetchUser]);
 
   const login = async (credentials) => {

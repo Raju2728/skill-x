@@ -1,4 +1,5 @@
-import { Sparkles, Globe, Share2, Heart } from 'lucide-react';
+import { Globe, Share2, Heart } from 'lucide-react';
+import Logo from '../ui/Logo';
 import './Footer.css';
 
 export default function Footer() {
@@ -6,10 +7,7 @@ export default function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <div className="footer-brand">
-          <div className="footer-logo">
-            <Sparkles size={18} />
-            <span>Skill X</span>
-          </div>
+          <Logo size="md" />
           <p className="footer-tagline">
             Exchange skills, grow together.
           </p>

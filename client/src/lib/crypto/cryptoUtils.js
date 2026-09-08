@@ -131,6 +131,80 @@ export async function decryptText(aesKey, ciphertextBase64, nonceBase64) {
   return new TextDecoder().decode(decryptedBuffer);
 }
 
+// Generate ECDSA P-256 Signing Key Pair for Pre-key Authentication
+export async function generateSigningKeyPair() {
+  return await window.crypto.subtle.generateKey(
+    {
+      name: 'ECDSA',
+      namedCurve: 'P-256',
+    },
+    true,
+    ['sign', 'verify']
+  );
+}
+
+// Sign data using ECDSA P-256 Private Key
+export async function signData(privateSigningKey, dataString) {
+  const dataBytes = new TextEncoder().encode(dataString);
+  const signatureBuffer = await window.crypto.subtle.sign(
+    {
+      name: 'ECDSA',
+      hash: { name: 'SHA-256' },
+    },
+    privateSigningKey,
+    dataBytes
+  );
+  return bufferToBase64(signatureBuffer);
+}
+
+// Verify signature using ECDSA P-256 Public Key
+export async function verifySignature(publicSigningKey, signatureBase64, dataString) {
+  try {
+    const signatureBuffer = base64ToBuffer(signatureBase64);
+    const dataBytes = new TextEncoder().encode(dataString);
+    return await window.crypto.subtle.verify(
+      {
+        name: 'ECDSA',
+        hash: { name: 'SHA-256' },
+      },
+      publicSigningKey,
+      signatureBuffer,
+      dataBytes
+    );
+  } catch (err) {
+    console.error('Signature verification error:', err);
+    return false;
+  }
+}
+
+// Import Public Signing Key from JWK
+export async function importPublicSigningJWK(jwk) {
+  return await window.crypto.subtle.importKey(
+    'jwk',
+    jwk,
+    {
+      name: 'ECDSA',
+      namedCurve: 'P-256',
+    },
+    true,
+    ['verify']
+  );
+}
+
+// Import Private Signing Key from JWK
+export async function importPrivateSigningJWK(jwk) {
+  return await window.crypto.subtle.importKey(
+    'jwk',
+    jwk,
+    {
+      name: 'ECDSA',
+      namedCurve: 'P-256',
+    },
+    true,
+    ['sign']
+  );
+}
+
 // Generate Safety Number (Numeric Fingerprint) for identity verification
 export async function generateSafetyNumber(keyAJson, keyBJson) {
   const combined = [keyAJson, keyBJson].sort().join('::');

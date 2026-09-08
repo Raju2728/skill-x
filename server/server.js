@@ -12,6 +12,7 @@ const passport = require('passport');
 
 const connectDB = require('./config/database');
 const configurePassport = require('./config/passport');
+const { JWT_SECRET } = require('./config/jwt');
 const errorHandler = require('./middleware/errorHandler');
 
 // Route imports
@@ -75,7 +76,20 @@ configurePassport(passport);
 
 // Middleware
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+      imgSrc: ["'self'", "data:", "blob:", "https:", "http:"],
+      mediaSrc: ["'self'", "blob:", "data:"],
+      connectSrc: ["'self'", "https:", "wss:", "ws:", "http:"],
+      frameSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+    },
+  },
   crossOriginEmbedderPolicy: false,
 }));
 app.use(cors(corsOptions));

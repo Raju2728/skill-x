@@ -1,19 +1,9 @@
-import { createContext, useContext, useEffect, useState, useRef } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { io } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import keyManager from '../lib/crypto/keyManager';
+import WebRTCManager from '../lib/webrtc/WebRTCManager';
 
-// ---------------------------------------------------------------------------
-// Socket URL resolution
-//
-// Development (npm run dev):
-//   VITE_SOCKET_URL is empty → connect to window.location.origin
-//   Vite's dev-server proxy forwards /socket.io → ws://localhost:5000
-//
-// Production (Vercel):
-//   VITE_SOCKET_URL = 'https://your-backend.onrender.com'
-//   Socket.IO connects directly to the persistent backend server
-// ---------------------------------------------------------------------------
 const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || window.location.origin;
 
 const SocketContext = createContext(null);
@@ -23,6 +13,7 @@ export function SocketProvider({ children }) {
   const [socket, setSocket] = useState(null);
   const [onlineUsers, setOnlineUsers] = useState(new Set());
   const [incomingCall, setIncomingCall] = useState(null);
+  const [activeCall, setActiveCall] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated || !user?._id) {
@@ -36,45 +27,64 @@ export function SocketProvider({ children }) {
     // Initialize user encryption keys in background
     keyManager.initializeKeys(user._id).catch(console.error);
 
-    // Read JWT from first-party cookie so we can pass it explicitly
-    // in the handshake — required for cross-origin production deployments
-    // where third-party cookies are blocked by browsers.
     function getTokenCookie() {
       const match = document.cookie.match(/(^| )token=([^;]+)/);
       return match ? match[2] : null;
     }
 
-    // Connect to Socket.IO server
+    // Connect to Socket.IO server with dynamic auth callback (HIGH-010)
     const s = io(SOCKET_URL, {
       withCredentials: true,
-      auth: { token: getTokenCookie() },
+      auth: (cb) => {
+        cb({ token: getTokenCookie() });
+      },
       transports: ['websocket', 'polling'],
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
     });
+
+    // Provide socket instance to WebRTC Manager
+    WebRTCManager.setSocket(s);
 
     s.on('connect', () => {
       console.log('⚡ Connected to Skill X Real-time Gateway:', s.id);
     });
 
     s.on('presence:online', ({ userId }) => {
-      setOnlineUsers(prev => new Set([...prev, userId]));
+      setOnlineUsers((prev) => new Set([...prev, userId]));
     });
 
     s.on('presence:offline', ({ userId }) => {
-      setOnlineUsers(prev => {
+      setOnlineUsers((prev) => {
         const next = new Set(prev);
         next.delete(userId);
         return next;
       });
     });
 
-    s.on('call:request', (data) => {
-      setIncomingCall(data);
+    // Incoming call handling
+    s.on('call:incoming', (callData) => {
+      setIncomingCall(callData);
     });
 
-    s.on('call:end', () => {
+    // Backwards-compatible event handler
+    s.on('call:request', (callData) => {
+      setIncomingCall(callData);
+    });
+
+    s.on('call:timeout', () => {
       setIncomingCall(null);
+      setActiveCall(null);
+    });
+
+    s.on('call:rejected', () => {
+      setIncomingCall(null);
+      setActiveCall(null);
+    });
+
+    s.on('call:ended', () => {
+      setIncomingCall(null);
+      setActiveCall(null);
     });
 
     setSocket(s);
@@ -89,13 +99,17 @@ export function SocketProvider({ children }) {
   };
 
   return (
-    <SocketContext.Provider value={{
-      socket,
-      onlineUsers,
-      isUserOnline,
-      incomingCall,
-      setIncomingCall,
-    }}>
+    <SocketContext.Provider
+      value={{
+        socket,
+        onlineUsers,
+        isUserOnline,
+        incomingCall,
+        setIncomingCall,
+        activeCall,
+        setActiveCall,
+      }}
+    >
       {children}
     </SocketContext.Provider>
   );

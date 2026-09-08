@@ -42,6 +42,18 @@ class E2EEService {
       throw new Error('Partner public key bundle not found');
     }
 
+    // HIGH-002: Verify signed pre-key signature if provided
+    if (data.bundle.signingKey && data.bundle.signedPreKey?.signature) {
+      const isValid = await keyManager.verifyPeerPreKey(
+        JSON.parse(data.bundle.signingKey),
+        data.bundle.signedPreKey.key,
+        data.bundle.signedPreKey.signature
+      );
+      if (!isValid) {
+        console.warn('⚠️ [SECURITY WARNING] Partner pre-key cryptographic signature could not be verified!');
+      }
+    }
+
     const partnerPublicJWK = JSON.parse(data.bundle.identityKey);
     const partnerPublicKey = await importPublicJWK(partnerPublicJWK);
 
@@ -58,25 +70,20 @@ class E2EEService {
   }
 
   /**
-   * Encrypt a text message for a conversation
+   * Encrypt a text message for a conversation (HIGH-001: No silent plaintext fallback)
    */
   async encryptMessage(conversationId, currentUserId, partnerUserId, plaintext) {
-    try {
-      const aesKey = await this.getOrCreateSessionKey(conversationId, currentUserId, partnerUserId);
-      const encrypted = await encryptText(aesKey, plaintext);
-      return encrypted;
-    } catch (err) {
-      console.error('E2EE Encryption error:', err);
-      // Dev fallback if keys fail
-      return {
-        ciphertext: window.btoa(plaintext),
-        nonce: window.btoa('dev_fallback_iv'),
-      };
+    const aesKey = await this.getOrCreateSessionKey(conversationId, currentUserId, partnerUserId);
+    if (!aesKey) {
+      throw new Error('Failed to establish secure session encryption key');
     }
+
+    // Encrypt using AES-256-GCM with fresh cryptographically random IV
+    return await encryptText(aesKey, plaintext);
   }
 
   /**
-   * Decrypt a message ciphertext
+   * Decrypt a message ciphertext (HIGH-001: No insecure atob fallback)
    */
   async decryptMessage(conversationId, currentUserId, partnerUserId, ciphertext, nonce) {
     if (!ciphertext) return '';
@@ -84,12 +91,8 @@ class E2EEService {
       const aesKey = await this.getOrCreateSessionKey(conversationId, currentUserId, partnerUserId);
       return await decryptText(aesKey, ciphertext, nonce);
     } catch (err) {
-      // If native decrypt fails, try fallback decode
-      try {
-        return window.atob(ciphertext);
-      } catch {
-        return '[Encrypted message: session key mismatch]';
-      }
+      console.error('Decryption failed for message:', err);
+      return '[Encrypted message: session key unavailable]';
     }
   }
 

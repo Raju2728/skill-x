@@ -1,11 +1,12 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
-  Sparkles, Home, Search, Users, MessageCircle, Calendar,
+  Home, Search, Users, MessageCircle, Calendar,
   BookOpen, Star, Shield, ChevronLeft, ChevronRight,
   LogOut, UserCircle,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import Avatar from '../ui/Avatar';
+import Logo from '../ui/Logo';
 import './Sidebar.css';
 
 const navItems = [
@@ -32,10 +33,7 @@ export default function Sidebar({ collapsed, onToggle }) {
     <aside className={`sidebar ${collapsed ? 'sidebar-collapsed' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-brand">
-          <div className="sidebar-logo">
-            <Sparkles size={20} />
-          </div>
-          {!collapsed && <span className="sidebar-app-name">Skill X</span>}
+          <Logo size="sm" showText={!collapsed} />
         </div>
         <button className="sidebar-toggle" onClick={onToggle} aria-label="Toggle sidebar">
           {collapsed ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}

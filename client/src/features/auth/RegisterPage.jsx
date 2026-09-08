@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, AtSign, Sparkles } from 'lucide-react';
+import { Mail, Lock, User, AtSign } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { authAPI } from '../../services/api';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
+import Logo from '../../components/ui/Logo';
 import './AuthPages.css';
 
 export default function RegisterPage() {
@@ -80,9 +81,8 @@ export default function RegisterPage() {
 
       <div className="auth-container auth-container-wide animate-fade-in-up">
         <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <Sparkles size={24} />
-            <span>Skill X</span>
+          <Link to="/" className="auth-logo" aria-label="Skill X Home">
+            <Logo size="lg" />
           </Link>
           <h1 className="auth-title">Create your account</h1>
           <p className="auth-subtitle">Start exchanging skills and growing together</p>

@@ -24,13 +24,56 @@ const storage = multer.diskStorage({
   },
 });
 
+// Allowed MIME types and extensions whitelist
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'application/pdf',
+  'text/plain',
+  'text/markdown',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]);
+
+const ALLOWED_EXTENSIONS = new Set([
+  '.jpg', '.jpeg', '.png', '.webp', '.gif',
+  '.pdf', '.txt', '.md', '.doc', '.docx'
+]);
+
+const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (!ALLOWED_EXTENSIONS.has(ext)) {
+    return cb(new Error('File extension not allowed. Supported formats: images (JPG, PNG, WEBP, GIF), documents (PDF, DOC, DOCX, TXT, MD)'));
+  }
+  if (!ALLOWED_MIME_TYPES.has(file.mimetype)) {
+    return cb(new Error('File MIME type not permitted'));
+  }
+  cb(null, true);
+};
+
 const upload = multer({
   storage,
-  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB limit
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB safe limit
+  fileFilter,
 });
 
+// Upload middleware with custom error handling
+const handleUpload = (req, res, next) => {
+  upload.single('file')(req, res, (err) => {
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        return res.status(400).json({ message: 'File size exceeds maximum allowed limit of 10MB' });
+      }
+      return res.status(400).json({ message: err.message || 'File upload validation failed' });
+    }
+    next();
+  });
+};
+
 // Upload a file (Meeting attachment or chat file)
-router.post('/', requireAuth, upload.single('file'), async (req, res, next) => {
+router.post('/', requireAuth, handleUpload, async (req, res, next) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No file uploaded' });

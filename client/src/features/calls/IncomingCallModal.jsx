@@ -1,44 +1,71 @@
-import { useState } from 'react';
-import { Phone, PhoneOff, Video, Loader } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Phone, PhoneOff, Video, Loader, ShieldAlert } from 'lucide-react';
 import { useSocket } from '../../contexts/SocketContext';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../../components/ui/Avatar';
+import { startRingtone, stopRingtone } from '../../lib/webrtc/ringtone';
 import './IncomingCallModal.css';
 
 export default function IncomingCallModal() {
-  const { incomingCall, setIncomingCall, socket } = useSocket();
+  const { incomingCall, setIncomingCall, socket, setActiveCall } = useSocket();
   const navigate = useNavigate();
   const [permissionState, setPermissionState] = useState('idle'); // idle | requesting | denied
   const [permissionError, setPermissionError] = useState('');
 
+  useEffect(() => {
+    if (incomingCall) {
+      startRingtone();
+    }
+    return () => {
+      stopRingtone();
+    };
+  }, [incomingCall]);
+
   if (!incomingCall) return null;
 
-  const { callerId, callerName, callerAvatar, callType = 'voice', conversationId } = incomingCall;
+  const { callId, callerId, callerName, callerAvatar, callType = 'voice', conversationId } = incomingCall;
 
   const handleAccept = async () => {
+    stopRingtone();
     setPermissionState('requesting');
     setPermissionError('');
 
     try {
-      // Request mic/camera permission based on call type
+      // User gesture triggered: request media stream
       const constraints = {
         audio: true,
         video: callType === 'video',
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      // Clean temporary test stream; the active call component will acquire and bind
+      stream.getTracks().forEach((track) => {
+        track.stop();
+        track.enabled = false;
+      });
 
-      // Permissions granted — stop tracks for now (the meeting room will re-acquire)
-      stream.getTracks().forEach(track => track.stop());
+      socket?.emit('call:accept', { callId, callerId, conversationId });
 
-      socket?.emit('call:accept', { callerId, conversationId });
+      const activeCallState = {
+        callId,
+        callType,
+        isIncoming: true,
+        callerId,
+        partner: {
+          _id: callerId,
+          name: callerName || 'Partner',
+          avatar: callerAvatar,
+        },
+      };
+
+      setActiveCall?.(activeCallState);
       setIncomingCall(null);
       setPermissionState('idle');
 
       navigate(`/app/chat`, {
         state: {
           partnerId: callerId,
-          activeCall: { callType, isIncoming: true, callerId },
+          activeCall: activeCallState,
         },
       });
     } catch (err) {
@@ -47,20 +74,21 @@ export default function IncomingCallModal() {
 
       if (err.name === 'NotAllowedError') {
         setPermissionError(
-          `${callType === 'video' ? 'Camera & Microphone' : 'Microphone'} access was denied. Please allow permissions in your browser settings to accept calls.`
+          `${callType === 'video' ? 'Camera & Microphone' : 'Microphone'} access was denied. Please allow device permissions in your browser address bar to accept the call.`
         );
       } else if (err.name === 'NotFoundError') {
         setPermissionError(
           `No ${callType === 'video' ? 'camera or microphone' : 'microphone'} found on this device.`
         );
       } else {
-        setPermissionError('Failed to access media devices. Please check your device settings.');
+        setPermissionError('Failed to access media devices. Please check device connections.');
       }
     }
   };
 
   const handleDecline = () => {
-    socket?.emit('call:reject', { callerId, reason: 'declined', conversationId });
+    stopRingtone();
+    socket?.emit('call:reject', { callId, callerId, reason: 'declined', conversationId });
     setIncomingCall(null);
     setPermissionState('idle');
     setPermissionError('');
@@ -70,7 +98,7 @@ export default function IncomingCallModal() {
     <div className="incoming-call-backdrop animate-fade-in">
       <div className="incoming-call-card animate-scale-in">
         <div className="incoming-call-pulse">
-          <Avatar src={callerAvatar} name={callerName || 'Caller'} size="xl" />
+          <Avatar src={callerAvatar} name={callerName || 'Caller'} size="2xl" />
         </div>
 
         <div className="incoming-call-info">
@@ -80,11 +108,12 @@ export default function IncomingCallModal() {
               Requesting {callType === 'video' ? 'camera & microphone' : 'microphone'} access...
             </p>
           ) : permissionState === 'denied' ? (
-            <p className="incoming-call-error-msg">
-              {permissionError}
-            </p>
+            <div className="incoming-call-error-box">
+              <ShieldAlert size={16} className="text-danger" />
+              <p className="incoming-call-error-msg">{permissionError}</p>
+            </div>
           ) : (
-            <p>
+            <p className="incoming-call-type-label">
               Incoming {callType === 'video' ? 'Video' : 'Voice'} Call...
             </p>
           )}
@@ -96,6 +125,7 @@ export default function IncomingCallModal() {
             className="call-btn-decline"
             onClick={handleDecline}
             aria-label="Decline call"
+            title="Decline"
           >
             <PhoneOff size={22} />
           </button>
@@ -106,6 +136,7 @@ export default function IncomingCallModal() {
             onClick={handleAccept}
             disabled={permissionState === 'requesting'}
             aria-label="Accept call"
+            title="Accept"
           >
             {permissionState === 'requesting' ? (
               <Loader size={22} className="animate-spin" />

@@ -2,6 +2,7 @@ const express = require('express');
 const { requireAuth } = require('../middleware/auth');
 const Skill = require('../models/Skill');
 const UserSkill = require('../models/UserSkill');
+const { escapeRegex } = require('../utils/sanitize');
 const router = express.Router();
 
 // Get all skills
@@ -9,7 +10,7 @@ router.get('/', async (req, res, next) => {
   try {
     const { search, category } = req.query;
     const filter = { status: 'active' };
-    if (search) filter.name = { $regex: search, $options: 'i' };
+    if (search) filter.name = { $regex: escapeRegex(search.trim()), $options: 'i' };
     if (category) filter.category = category;
     const skills = await Skill.find(filter).sort('name');
     res.json({ skills });

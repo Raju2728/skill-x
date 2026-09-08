@@ -75,6 +75,7 @@ export const authAPI = {
   getConfig: () => api.get('/auth/config'),
   forgotPassword: (email) => api.post('/auth/forgot-password', { email }),
   resetPassword: (token, password) => api.post(`/auth/reset-password/${token}`, { password }),
+  exchangeOAuthCode: (code) => api.post('/auth/oauth-exchange', { code }),
   // Google OAuth — redirect to backend (not Vercel) so the server handles the OAuth flow
   googleAuth: () => {
     const backendUrl = import.meta.env.VITE_API_URL || '';
