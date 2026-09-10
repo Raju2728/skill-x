@@ -120,4 +120,25 @@ router.get('/session/:sessionId', requireAuth, async (req, res, next) => {
   }
 });
 
+// Download a file with attachment header and original name
+router.get('/download/:filename', (req, res, next) => {
+  try {
+    const safeFilename = path.basename(req.params.filename);
+    const filePath = path.join(uploadDir, safeFilename);
+
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ message: 'File not found on server' });
+    }
+
+    const downloadName = req.query.name || safeFilename;
+    res.download(filePath, downloadName, (err) => {
+      if (err && !res.headersSent) {
+        next(err);
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 module.exports = router;

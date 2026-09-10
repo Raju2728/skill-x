@@ -1,13 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User, Award, BookOpen, Calendar, Shield, Save, ArrowLeft,
-  Camera, MapPin, Globe, Check
+  Camera, MapPin, Globe, Check, Trash2, Upload
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { userAPI } from '../../services/api';
 import api from '../../services/api';
 import { useToast } from '../../components/ui/Toast';
+import { ImageCropModal } from '../../components/ui';
 import Button from '../../components/ui/Button';
 import Input from '../../components/ui/Input';
 import Avatar from '../../components/ui/Avatar';
@@ -20,7 +21,7 @@ import { PageLoader } from '../../components/ui/Spinner';
 import './ProfileEditPage.css';
 
 const languageOptions = [
-  'English', 'Spanish', 'French', 'German', 'Japanese',
+  'English', 'Tamil', 'Spanish', 'French', 'German', 'Japanese',
   'Mandarin Chinese', 'Portuguese', 'Hindi', 'Arabic', 'Russian', 'Italian', 'Korean'
 ];
 
@@ -52,6 +53,55 @@ export default function ProfileEditPage() {
     showOnlineStatus: true,
     allowDiscovery: true,
   });
+
+  // Avatar upload & cropper states
+  const [cropModalOpen, setCropModalOpen] = useState(false);
+  const [cropRawSrc, setCropRawSrc] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef(null);
+
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Invalid file', 'Please select an image file (JPG, PNG, WEBP).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error('File too large', 'Image size must be under 10MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropRawSrc(reader.result);
+      setCropModalOpen(true);
+      e.target.value = '';
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleCropComplete = async (croppedBlob) => {
+    setUploadingAvatar(true);
+    try {
+      const { data } = await userAPI.uploadAvatar(croppedBlob);
+      setAvatar(data.avatarUrl);
+      await refreshUser();
+      setCropModalOpen(false);
+      toast.success('Avatar updated', 'Your new profile photo has been cropped and saved.');
+    } catch (err) {
+      console.error('Failed to upload avatar:', err);
+      toast.error('Upload failed', err.response?.data?.message || 'Could not upload avatar image.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleRemoveAvatar = () => {
+    setAvatar('');
+    toast.info('Avatar removed', 'Initials will be shown as your profile avatar.');
+  };
 
   useEffect(() => {
     async function loadFullProfile() {
@@ -141,15 +191,53 @@ export default function ProfileEditPage() {
       content: (
         <div className="edit-tab-panel animate-fade-in">
           <div className="edit-avatar-section">
-            <Avatar src={avatar} name={name} size="xl" />
-            <div className="edit-avatar-inputs">
-              <Input
-                label="Avatar Image URL"
-                placeholder="https://example.com/avatar.jpg"
-                value={avatar}
-                onChange={(e) => setAvatar(e.target.value)}
-                hint="Paste an image link or leave empty to use your initials"
-              />
+            <div className="edit-avatar-preview-wrap">
+              <Avatar src={avatar} name={name} size="xl" />
+              {avatar && (
+                <button
+                  type="button"
+                  className="edit-avatar-remove-btn"
+                  onClick={handleRemoveAvatar}
+                  title="Remove custom photo"
+                >
+                  <Trash2 size={13} />
+                </button>
+              )}
+            </div>
+            <div className="edit-avatar-controls">
+              <h4 className="edit-avatar-title">Profile Photo</h4>
+              <p className="edit-avatar-desc">
+                Upload a photo to help exchange partners recognize you. You can crop, zoom, and reposition your photo before saving.
+              </p>
+              <div className="edit-avatar-btn-group">
+                <Button
+                  type="button"
+                  icon={Camera}
+                  onClick={() => fileInputRef.current?.click()}
+                  loading={uploadingAvatar}
+                  size="sm"
+                >
+                  Upload Photo
+                </Button>
+                {avatar && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    icon={Trash2}
+                    onClick={handleRemoveAvatar}
+                  >
+                    Remove Photo
+                  </Button>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  style={{ display: 'none' }}
+                  onChange={handleFileSelect}
+                />
+              </div>
             </div>
           </div>
 
@@ -323,7 +411,26 @@ export default function ProfileEditPage() {
 
       <Card variant="surface" padding="none" className="edit-card-wrapper">
         <Tabs tabs={tabs} defaultTab="basic" />
+        <div className="edit-bottom-actions">
+          <Button variant="secondary" onClick={() => navigate('/app/profile')}>
+            Cancel
+          </Button>
+          <Button icon={Save} onClick={handleSaveAll} loading={saving}>
+            Save Changes
+          </Button>
+        </div>
       </Card>
+
+      {/* Image Crop Modal */}
+      <ImageCropModal
+        isOpen={cropModalOpen}
+        imageSrc={cropRawSrc}
+        onCropComplete={handleCropComplete}
+        onClose={() => setCropModalOpen(false)}
+        cropShape="round"
+        title="Crop Profile Photo"
+        loading={uploadingAvatar}
+      />
     </div>
   );
 }

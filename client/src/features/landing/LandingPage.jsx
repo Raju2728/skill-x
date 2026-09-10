@@ -1,7 +1,8 @@
 import { Link } from 'react-router-dom';
 import {
   ArrowRight, Users, MessageCircle, Shield, Video, BookOpen, Calendar,
-  Sparkles, Zap, Globe, Star, ChevronRight, CheckCircle,
+  Sparkles, Zap, Globe, Star, ChevronRight, CheckCircle, Play,
+  Repeat, Phone, Lock,
 } from 'lucide-react';
 import Button from '../../components/ui/Button';
 import './LandingPage.css';
@@ -39,6 +40,13 @@ const features = [
   },
 ];
 
+const heroChips = [
+  { icon: Repeat, label: 'Skill Exchange', desc: 'Share what you know, learn what you need' },
+  { icon: Phone, label: 'Voice & Video Calls', desc: 'Connect with crystal clear voice and video' },
+  { icon: Calendar, label: 'Scheduled Meetings', desc: 'Plan your sessions at your convenience' },
+  { icon: Lock, label: 'End-to-End Encryption', desc: 'Your data and conversations stay private' },
+];
+
 const steps = [
   { num: '01', title: 'Create Your Profile', desc: 'Share what you know and what you want to learn.' },
   { num: '02', title: 'Get Matched', desc: 'Our engine finds compatible exchange partners.' },
@@ -64,42 +72,56 @@ export default function LandingPage() {
           <div className="hero-grid" />
         </div>
 
-        <div className="hero-content animate-fade-in-up">
-          <div className="hero-badge">
-            <Sparkles size={14} />
-            <span>The future of peer-to-peer learning</span>
+        <div className="hero-inner">
+          <div className="hero-content animate-fade-in-up">
+            <div className="hero-badge">
+              <Sparkles size={14} />
+              <span>The future of peer-to-peer learning</span>
+            </div>
+
+            <h1 className="hero-title">
+              Share Skills<br />
+              Learn Together<br />
+              <span className="hero-title-gradient">Grow Faster</span>
+            </h1>
+
+            <p className="hero-subtitle">
+              Skill X is a modern platform where people exchange skills, learn from each other
+              and build a better future — together.
+            </p>
+
+            <div className="hero-actions">
+              <Link to="/register">
+                <Button size="lg" iconRight={ArrowRight}>Get Started</Button>
+              </Link>
+              <a href="#features">
+                <Button variant="outline" size="lg" icon={Play}>Watch Video</Button>
+              </a>
+            </div>
           </div>
 
-          <h1 className="hero-title">
-            Exchange Skills,<br />
-            <span className="hero-title-gradient">Grow Together</span>
-          </h1>
-
-          <p className="hero-subtitle">
-            Teach what you know, learn what you need. Connect with compatible partners
-            through intelligent matching, encrypted chat, and HD video sessions.
-          </p>
-
-          <div className="hero-actions">
-            <Link to="/register">
-              <Button size="lg" iconRight={ArrowRight}>Start Learning Free</Button>
-            </Link>
-            <a href="#features">
-              <Button variant="secondary" size="lg">See How It Works</Button>
-            </a>
+          <div className="hero-illustration animate-fade-in-right">
+            <img
+              src="/hero-illustration.jpg"
+              alt="People collaborating and exchanging skills"
+              className="hero-illustration-img"
+            />
           </div>
+        </div>
 
-          <div className="hero-stats">
-            {stats.map((stat) => (
-              <div key={stat.label} className="hero-stat">
-                <span className="hero-stat-value">
-                  {stat.icon && <stat.icon size={16} className="text-warning" />}
-                  {stat.value}
-                </span>
-                <span className="hero-stat-label">{stat.label}</span>
+        {/* Hero Feature Chips */}
+        <div className="hero-chips animate-fade-in-up">
+          {heroChips.map((chip) => (
+            <div key={chip.label} className="hero-chip">
+              <div className="hero-chip-icon">
+                <chip.icon size={20} />
               </div>
-            ))}
-          </div>
+              <div className="hero-chip-text">
+                <span className="hero-chip-label">{chip.label}</span>
+                <span className="hero-chip-desc">{chip.desc}</span>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -132,7 +154,7 @@ export default function LandingPage() {
       </section>
 
       {/* How it works */}
-      <section className="section section-dark" id="how-it-works">
+      <section className="section section-alt" id="how-it-works">
         <div className="section-inner">
           <div className="section-header">
             <div className="section-badge">
@@ -148,6 +170,23 @@ export default function LandingPage() {
                 <span className="step-num">{step.num}</span>
                 <h3 className="step-title">{step.title}</h3>
                 <p className="step-desc">{step.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Stats */}
+      <section className="section">
+        <div className="section-inner">
+          <div className="stats-grid stagger-children">
+            {stats.map((stat) => (
+              <div key={stat.label} className="stat-block">
+                <span className="stat-block-value">
+                  {stat.icon && <stat.icon size={20} className="text-warning" />}
+                  {stat.value}
+                </span>
+                <span className="stat-block-label">{stat.label}</span>
               </div>
             ))}
           </div>

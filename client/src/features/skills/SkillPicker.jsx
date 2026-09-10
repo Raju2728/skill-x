@@ -45,6 +45,7 @@ const FALLBACK_SKILLS = [
   { _id: 'f-video', name: 'Video Editing', category: 'Design & Creative', description: 'Premiere Pro / DaVinci Resolve editing' },
   { _id: 'f-motion', name: 'Motion Graphics', category: 'Design & Creative', description: 'Animation and visual effects with After Effects' },
   // Languages
+  { _id: 'f-tamil', name: 'Tamil', category: 'Languages', description: 'Conversational Tamil, reading, grammar, and literature' },
   { _id: 'f-spanish', name: 'Spanish', category: 'Languages', description: 'Conversational and grammar Spanish' },
   { _id: 'f-french', name: 'French', category: 'Languages', description: 'French pronunciation, idioms, and conversation' },
   { _id: 'f-german', name: 'German', category: 'Languages', description: 'Grammar structures, technical and conversational German' },

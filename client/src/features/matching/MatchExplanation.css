@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
+  padding: 4px 0;
 }
 
 .match-explain-partner-row {
@@ -14,33 +15,41 @@
 
 .match-explain-partner-info {
   flex: 1;
+  min-width: 0;
 }
 
 .match-explain-partner-info h4 {
   font-size: var(--text-base);
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin: 0 0 2px 0;
 }
 
 .match-explain-score-badge {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   background: var(--accent-primary-muted);
   border: 1px solid rgba(79, 110, 247, 0.3);
   padding: 6px 14px;
   border-radius: var(--radius-lg);
+  flex-shrink: 0;
 }
 
 .match-explain-score-val {
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
   color: var(--accent-primary);
+  line-height: 1.1;
 }
 
 .match-explain-score-lbl {
   font-size: 10px;
   color: var(--text-secondary);
   text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }
 
 .match-exchange-summary {
@@ -49,21 +58,28 @@
   gap: var(--space-3);
   background: var(--bg-tertiary);
   padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
 }
 
 .exchange-col {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
   font-size: var(--text-xs);
 }
 
 .exchange-col-lbl {
   color: var(--text-tertiary);
   font-size: 10px;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.exchange-col strong {
+  color: var(--text-primary);
+  font-weight: 600;
 }
 
 .match-subsection-title {
@@ -71,10 +87,10 @@
   align-items: center;
   gap: var(--space-2);
   font-size: var(--text-xs);
-  font-weight: var(--font-semibold);
+  font-weight: var(--font-bold);
   color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
   margin-bottom: var(--space-3);
 }
 
@@ -87,7 +103,7 @@
 .match-bar-row {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .match-bar-label-group {
@@ -102,15 +118,18 @@
   align-items: center;
   gap: var(--space-2);
   color: var(--text-primary);
+  font-weight: 500;
 }
 
 .match-bar-value {
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+  font-weight: 600;
 }
 
 .match-bar-track {
-  height: 6px;
+  height: 8px;
   background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-full);
   overflow: hidden;
 }
@@ -122,19 +141,21 @@
 }
 
 .match-reasons-box {
-  background: var(--bg-primary);
-  border: 1px solid var(--border);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
   padding: var(--space-4);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius-xl);
 }
 
 .match-reasons-list {
   padding-left: var(--space-4);
   font-size: var(--text-xs);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  line-height: 1.5;
+  margin: 0;
 }
 
 .match-reasons-list li {

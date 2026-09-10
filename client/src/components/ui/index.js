@@ -11,3 +11,4 @@ export { default as Tabs } from './Tabs';
 export { default as Toggle } from './Toggle';
 export { default as Dropdown, DropdownItem, DropdownDivider } from './Dropdown';
 export { default as Select } from './Select';
+export { default as ImageCropModal } from './ImageCropModal';

@@ -13,6 +13,7 @@
 }
 
 .discover-title {
+  font-family: var(--font-display);
   font-size: var(--text-2xl);
   font-weight: var(--font-bold);
   letter-spacing: -0.5px;
@@ -33,14 +34,15 @@
 
 .discover-sidebar {
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-2xl);
   padding: var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
   position: sticky;
   top: 80px;
+  box-shadow: var(--shadow-card);
 }
 
 .discover-sidebar-header {
@@ -57,6 +59,7 @@
   color: var(--accent-primary);
   font-size: var(--text-xs);
   cursor: pointer;
+  font-weight: var(--font-medium);
 }
 
 .clear-filters-btn:hover {
@@ -89,10 +92,10 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 10px;
+  padding: 8px 12px;
   background: transparent;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   color: var(--text-secondary);
   font-size: var(--text-xs);
   text-align: left;
@@ -106,19 +109,25 @@
 }
 
 .cat-filter-btn-active {
-  background: var(--accent-primary-muted);
-  color: var(--accent-primary);
+  background: var(--accent-primary);
+  color: white;
   font-weight: var(--font-semibold);
+}
+
+.cat-filter-btn-active:hover {
+  background: var(--accent-primary-hover);
+  color: white;
 }
 
 .filter-select {
   width: 100%;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-lg);
   color: var(--text-primary);
   font-size: var(--text-xs);
+  transition: border-color var(--transition-fast);
 }
 
 .filter-select:focus {
@@ -156,11 +165,12 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 3px 8px;
+  padding: 4px 12px;
   background: var(--accent-primary-muted);
   color: var(--accent-primary);
   border-radius: var(--radius-full);
   font-size: 11px;
+  font-weight: var(--font-medium);
 }
 
 .filter-chip svg {
@@ -177,8 +187,9 @@
   text-align: center;
   padding: var(--space-16) var(--space-4);
   background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-card);
 }
 
 .discover-empty-state h3 {
@@ -203,6 +214,13 @@
 .pagination-text {
   font-size: var(--text-xs);
   color: var(--text-secondary);
+}
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .discover-layout {
+    grid-template-columns: 200px 1fr;
+  }
 }
 
 @media (max-width: 860px) {

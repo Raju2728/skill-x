@@ -1,54 +1,137 @@
+/* ===========================
+   Tabs Component — Modern Segmented Button Nav
+   =========================== */
+
+.tabs {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
 .tabs-list {
   display: flex;
-  gap: var(--space-1);
-  border-bottom: 1px solid var(--border);
+  align-items: center;
+  gap: 8px;
+  padding: 6px;
+  background: var(--bg-tertiary);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-2xl);
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
 
-.tabs-list::-webkit-scrollbar { display: none; }
+.tabs-list::-webkit-scrollbar {
+  display: none;
+}
 
-.tab-item {
-  display: flex;
+/* Individual tab button */
+.tab-item,
+.tab-btn {
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--radius-xl);
   font-size: var(--text-sm);
-  font-weight: var(--font-medium);
+  font-weight: 600;
   color: var(--text-secondary);
-  border: none;
-  background: none;
-  cursor: pointer;
   white-space: nowrap;
-  position: relative;
-  transition: color var(--transition-fast);
-  border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1.5px solid transparent;
+  background: transparent;
+  user-select: none;
 }
 
-.tab-item:hover {
+.tab-item:hover,
+.tab-btn:hover {
   color: var(--text-primary);
+  background: var(--bg-hover);
+  border-color: var(--border-light);
+  transform: translateY(-1px);
 }
 
-.tab-active {
+/* Active tab button — elevated distinct button appearance */
+.tab-item.tab-active,
+.tab-btn.tab-btn-active,
+.tab-active,
+.tab-btn-active {
+  background: var(--bg-secondary) !important;
+  color: var(--accent-primary) !important;
+  font-weight: 700 !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+}
+
+[data-theme='dark'] .tab-item.tab-active,
+[data-theme='dark'] .tab-btn.tab-btn-active {
+  background: var(--bg-elevated) !important;
+  border-color: var(--border-light) !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+
+.tab-item svg,
+.tab-btn svg {
+  flex-shrink: 0;
+  transition: transform var(--transition-fast);
+}
+
+.tab-item.tab-active svg,
+.tab-btn.tab-btn-active svg {
+  transform: scale(1.1);
   color: var(--accent-primary);
-  border-bottom-color: var(--accent-primary);
 }
 
 .tab-count {
-  padding: 0 6px;
-  font-size: var(--text-xs);
-  background: var(--bg-tertiary);
-  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   min-width: 20px;
-  text-align: center;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
 }
 
-.tab-active .tab-count {
+.tab-item.tab-active .tab-count {
   background: var(--accent-primary-muted);
   color: var(--accent-primary);
 }
 
 .tab-panel {
-  padding-top: var(--space-4);
+  width: 100%;
+}
+
+/* Underline variant */
+.tabs-underline .tabs-list {
+  background: none;
+  padding: 0;
+  gap: 0;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
+}
+
+.tabs-underline .tab-item,
+.tabs-underline .tab-btn {
+  border-radius: 0;
+  padding: 12px 18px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tabs-underline .tab-item.tab-active,
+.tabs-underline .tab-btn.tab-btn-active {
+  background: none !important;
+  color: var(--accent-primary) !important;
+  border-bottom-color: var(--accent-primary) !important;
+  box-shadow: none !important;
 }

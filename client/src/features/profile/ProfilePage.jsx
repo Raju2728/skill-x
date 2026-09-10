@@ -102,8 +102,14 @@ export default function ProfilePage() {
                   </span>
                 )}
                 <span className="profile-meta-item">
-                  <Star size={14} className="text-warning fill-warning" />
-                  <strong>{ratingStats?.average || 5.0}</strong> ({ratingStats?.count || 0} reviews)
+                  <Star size={14} className={ratingStats?.count > 0 ? "text-warning fill-warning" : "text-tertiary"} />
+                  {ratingStats?.count > 0 ? (
+                    <>
+                      <strong>{Number(ratingStats.average).toFixed(1)}</strong> ({ratingStats.count} review{ratingStats.count > 1 ? 's' : ''})
+                    </>
+                  ) : (
+                    <span>New Member</span>
+                  )}
                 </span>
               </div>
             </div>

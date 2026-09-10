@@ -14,6 +14,7 @@ export default function VoiceCallUI({
   const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
   const [callDuration, setCallDuration] = useState(0);
   const [callStatus, setCallStatus] = useState(isIncoming ? 'Connecting...' : 'Ringing...');
+  const hasEndedRef = useRef(false);
 
   const audioRef = useRef(null);
 
@@ -57,7 +58,10 @@ export default function VoiceCallUI({
 
     return () => {
       if (timer) clearInterval(timer);
-      webRTCManager.closeCall();
+      // Only close call on unmount if we haven't already ended it via button
+      if (!hasEndedRef.current) {
+        webRTCManager.closeCall();
+      }
     };
   }, [partner._id, isIncoming, onEndCall]);
 
@@ -73,6 +77,14 @@ export default function VoiceCallUI({
     if (audioRef.current) {
       audioRef.current.muted = next;
     }
+  };
+
+  // Explicitly end the call — emits call:end to server so both users disconnect
+  const handleEndCall = () => {
+    if (hasEndedRef.current) return;
+    hasEndedRef.current = true;
+    webRTCManager.closeCall(true); // true = notify socket
+    onEndCall?.();
   };
 
   const formatTimer = (seconds) => {
@@ -115,7 +127,7 @@ export default function VoiceCallUI({
           <button
             type="button"
             className="voice-ctrl-end"
-            onClick={onEndCall}
+            onClick={handleEndCall}
             aria-label="End call"
           >
             <PhoneOff size={22} />

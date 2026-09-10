@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Phone, Video, Calendar, MoreVertical, ShieldCheck,
-  Sparkles, Lock, ArrowLeft
+  Sparkles, Lock, ArrowLeft, User
 } from 'lucide-react';
 import { conversationAPI, fileAPI } from '../../services/api';
 import e2eeService from '../../lib/crypto/e2eeService';
@@ -43,6 +43,27 @@ export default function ChatWindow({
     }
   }, [location.state?.activeCall]);
 
+  // Listen for remote call termination
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleCallEnded = () => {
+      setActiveCall(null);
+    };
+
+    const handleCallRejected = () => {
+      setActiveCall(null);
+    };
+
+    socket.on('call:ended', handleCallEnded);
+    socket.on('call:rejected', handleCallRejected);
+
+    return () => {
+      socket.off('call:ended', handleCallEnded);
+      socket.off('call:rejected', handleCallRejected);
+    };
+  }, [socket]);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -74,107 +95,77 @@ export default function ChatWindow({
 
     const handleReceiveMessage = (data) => {
       if (data.conversationId === conversation._id) {
-        // Deduplicate: avoid adding if we already have this message by _id
         setMessages(prev => {
           const msgId = data.message._id;
-          if (msgId && prev.some(m => m._id === msgId)) {
-            return prev;
-          }
+          if (msgId && prev.some(m => m._id === msgId)) return prev;
           return [...prev, data.message];
-        });
-
-        // Send read confirmation for partner's messages
-        if (data.message.senderId !== user?._id) {
-          socket.emit('message:read', {
-            conversationId: conversation._id,
-            senderId: data.message.senderId || partner._id,
-          });
-        }
-      }
-    };
-
-    // Handle server confirmation of our sent message (replace optimistic entry)
-    const handleMessagePersisted = (data) => {
-      if (data.conversationId === conversation._id) {
-        setMessages(prev => {
-          // Replace the optimistic message (matched by temp timestamp) with the persisted one
-          const updated = prev.map(m => {
-            if (m._tempTimestamp === data.tempTimestamp && !m._id) {
-              return data.message;
-            }
-            return m;
-          });
-          return updated;
         });
       }
     };
 
     const handleTypingStart = (data) => {
-      if (data.conversationId === conversation._id) {
+      if (data.conversationId === conversation._id && data.senderId === partner?._id) {
         setIsPartnerTyping(true);
       }
     };
 
     const handleTypingStop = (data) => {
-      if (data.conversationId === conversation._id) {
+      if (data.conversationId === conversation._id && data.senderId === partner?._id) {
         setIsPartnerTyping(false);
       }
     };
 
-    const handleMessageDelivered = ({ messageId }) => {
-      setMessages(prev => prev.map(m => m._id === messageId ? { ...m, deliveryStatus: 'delivered' } : m));
-    };
-
-    const handleMessageRead = ({ conversationId }) => {
-      if (conversationId === conversation._id) {
-        setMessages(prev => prev.map(m => ({ ...m, deliveryStatus: 'read' })));
-      }
-    };
-
     socket.on('message:receive', handleReceiveMessage);
-    socket.on('message:persisted', handleMessagePersisted);
     socket.on('typing:start', handleTypingStart);
     socket.on('typing:stop', handleTypingStop);
-    socket.on('message:delivered', handleMessageDelivered);
-    socket.on('message:read', handleMessageRead);
 
     return () => {
       socket.off('message:receive', handleReceiveMessage);
-      socket.off('message:persisted', handleMessagePersisted);
       socket.off('typing:start', handleTypingStart);
       socket.off('typing:stop', handleTypingStop);
-      socket.off('message:delivered', handleMessageDelivered);
-      socket.off('message:read', handleMessageRead);
     };
-  }, [socket, conversation?._id, partner?._id, user?._id]);
+  }, [socket, conversation?._id, partner?._id]);
 
-  const handleSendMessage = async ({ text, file }) => {
-    if (!text && !file) return;
+  const handleSendMessage = async ({ text, file, messageType: initialType }) => {
+    if (!partner?._id) return;
 
+    let payloadText = text;
+    let messageType = initialType || 'text';
     let fileMetadata = null;
-    let messageType = 'text';
 
     if (file) {
       try {
-        const formData = new FormData();
-        formData.append('file', file);
-        const fileRes = await fileAPI.upload(file);
+        const { data: uploadData } = await fileAPI.upload(file, {
+          conversationId: conversation._id,
+          recipientId: partner._id,
+        });
+        const fileDoc = uploadData.file || {};
+        const filePath = fileDoc.path || fileDoc.filename;
+        const resolvedUrl = uploadData.url || (filePath ? `/uploads/${filePath}` : '');
+        const originalName = fileDoc.name || file.name || 'attachment';
+
         fileMetadata = {
-          fileName: file.name,
-          fileSize: file.size,
-          mimeType: file.type,
-          fileUrl: fileRes.data?.url || URL.createObjectURL(file),
+          fileId: fileDoc._id,
+          filename: filePath,
+          originalName,
+          fileName: originalName,
+          mimeType: fileDoc.mimeType || file.type,
+          size: fileDoc.size || file.size,
+          fileSize: fileDoc.size || file.size,
+          url: resolvedUrl,
+          fileUrl: resolvedUrl,
         };
-        messageType = 'file';
-      } catch (err) {
-        console.error('File upload failed:', err);
+        messageType = file.type.startsWith('image/') ? 'image' : 'file';
+        payloadText = originalName;
+      } catch (uploadErr) {
+        console.error('File upload failed:', uploadErr);
+        alert('File upload failed. Please try again.');
+        return;
       }
     }
 
-    const payloadText = text || (file ? `Sent file: ${file.name}` : '');
-
-    // 1. Encrypt payload client-side using E2EE
-    let ciphertext, nonce;
+    let ciphertext = payloadText;
+    let nonce = '';
     try {
       const encrypted = await e2eeService.encryptMessage(
         conversation._id,
@@ -203,13 +194,11 @@ export default function ChatWindow({
       timestamp: tempTimestamp,
       _tempTimestamp: tempTimestamp,
       deliveryStatus: 'sent',
-      plaintext: payloadText, // Local preview immediately
+      plaintext: payloadText,
     };
 
-    // Optimistic UI update
     setMessages(prev => [...prev, messageObj]);
 
-    // 2. Broadcast via Socket.IO (server will persist and relay)
     if (socket?.connected) {
       socket.emit('message:send', {
         conversationId: conversation._id,
@@ -217,7 +206,6 @@ export default function ChatWindow({
         message: messageObj,
       });
     } else {
-      // 3. Fallback: Persist via REST API if socket is disconnected
       try {
         const { data } = await conversationAPI.sendMessage(conversation._id, {
           ciphertext,
@@ -225,7 +213,6 @@ export default function ChatWindow({
           messageType,
           fileMetadata,
         });
-        // Replace optimistic message with persisted one
         if (data.message) {
           setMessages(prev => prev.map(m =>
             m._tempTimestamp === tempTimestamp ? { ...data.message, plaintext: payloadText } : m
@@ -269,7 +256,7 @@ export default function ChatWindow({
 
   return (
     <div className="chat-window-panel">
-      {/* Header */}
+      {/* Redesigned Profile Information Header */}
       <div className="chat-window-header">
         <div className="chat-header-partner">
           {onBack && (
@@ -277,21 +264,38 @@ export default function ChatWindow({
               <ArrowLeft size={18} />
             </button>
           )}
-          <Avatar
-            src={partner?.avatar}
-            name={partner?.name}
-            size="md"
-            online={partner?.privacySettings?.showOnlineStatus ? isOnline : undefined}
-          />
+
+          <div className="chat-partner-avatar-wrap">
+            <Avatar
+              src={partner?.avatar}
+              name={partner?.name}
+              size="md"
+              online={partner?.privacySettings?.showOnlineStatus ? isOnline : undefined}
+            />
+          </div>
+
           <div className="chat-partner-info">
-            <Link to={`/app/profile/${partner?._id}`} className="chat-partner-name">
-              {partner?.name}
-            </Link>
-            <div className="flex items-center gap-2">
-              <span className="chat-partner-status">
+            <div className="chat-partner-primary-row">
+              <Link to={`/app/profile/${partner?._id}`} className="chat-partner-name">
+                {partner?.name || 'Peer Exchanger'}
+              </Link>
+              {partner?.username && (
+                <span className="chat-partner-handle">@{partner.username}</span>
+              )}
+              <span className={`chat-presence-pill ${isOnline ? 'is-online' : 'is-offline'}`}>
+                <span className="presence-dot" />
                 {isOnline ? 'Online' : 'Offline'}
               </span>
-              <SecurityIndicator partner={partner} />
+            </div>
+
+            <div className="chat-partner-secondary-row">
+              {partner?.teachSkills?.length > 0 ? (
+                <span className="chat-skills-chip" title="Skills this peer teaches">
+                  <Sparkles size={11} /> Teaches: {partner.teachSkills.slice(0, 2).map(s => s.name || s.skillId?.name || s).join(', ')}
+                </span>
+              ) : partner?.headline ? (
+                <span className="chat-partner-headline">{partner.headline}</span>
+              ) : null}
             </div>
           </div>
         </div>
@@ -300,31 +304,39 @@ export default function ChatWindow({
         <div className="chat-header-actions">
           <button
             type="button"
-            className="chat-action-btn"
+            className="chat-action-btn chat-action-call"
             onClick={() => startCall('voice')}
-            title="Start Voice Call"
+            title="Start Encrypted Voice Call"
             aria-label="Start Voice Call"
           >
             <Phone size={18} />
           </button>
           <button
             type="button"
-            className="chat-action-btn"
+            className="chat-action-btn chat-action-video"
             onClick={() => startCall('video')}
-            title="Start Video Meeting"
+            title="Start HD Video Meeting"
             aria-label="Start Video Meeting"
           >
             <Video size={18} />
           </button>
           <button
             type="button"
-            className="chat-action-btn"
+            className="chat-action-btn chat-action-session"
             onClick={() => navigate('/app/sessions', { state: { openScheduler: true, selectedPartner: partner } })}
-            title="Schedule Learning Session"
+            title="Schedule Skill Exchange Session"
             aria-label="Schedule Session"
           >
             <Calendar size={18} />
           </button>
+          <Link
+            to={`/app/profile/${partner?._id}`}
+            className="chat-action-btn chat-action-profile"
+            title="View Full Profile"
+            aria-label="View Profile"
+          >
+            <User size={18} />
+          </Link>
         </div>
       </div>
 
@@ -355,7 +367,7 @@ export default function ChatWindow({
               <MessageBubble
                 key={msg._id || `temp-${idx}`}
                 message={msg}
-                isOwn={msg.senderId === user?._id}
+                isOwn={String(msg.senderId?._id || msg.senderId) === String(user?._id)}
                 conversationId={conversation._id}
                 currentUserId={user?._id}
                 partnerUserId={partner?._id}

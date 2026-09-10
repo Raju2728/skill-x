@@ -9,6 +9,7 @@ const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
 const { Server: SocketServer } = require('socket.io');
 const passport = require('passport');
+const path = require('path');
 
 const connectDB = require('./config/database');
 const configurePassport = require('./config/passport');
@@ -43,6 +44,7 @@ const server = http.createServer(app);
 // res.cookie({ secure: true }) works correctly over HTTPS.
 // ---------------------------------------------------------------------------
 app.set('trust proxy', 1);
+app.disable('x-powered-by'); // Prevent technology fingerprinting from unauthorized actors
 
 // ---------------------------------------------------------------------------
 // CORS — allow the configured frontend origin.
@@ -146,7 +148,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Static uploads
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Error handler
 app.use(errorHandler);

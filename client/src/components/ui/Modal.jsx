@@ -35,10 +35,10 @@ export default function Modal({
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop animate-fade-in" onClick={closeOnBackdrop ? onClose : undefined}>
+    <div className="modal-backdrop" onClick={closeOnBackdrop ? onClose : undefined}>
       <div
         ref={modalRef}
-        className={`modal modal-${size} animate-scale-in`}
+        className={`modal modal-${size}`}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
@@ -48,7 +48,7 @@ export default function Modal({
         {title && (
           <div className="modal-header">
             <h3 className="modal-title">{title}</h3>
-            <button className="modal-close" onClick={onClose} aria-label="Close">
+            <button className="modal-close-btn" onClick={onClose} aria-label="Close">
               <X size={20} />
             </button>
           </div>

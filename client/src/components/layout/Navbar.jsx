@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import Button from '../ui/Button';
 import Avatar from '../ui/Avatar';
 import Logo from '../ui/Logo';
+import ThemeToggle from '../ui/ThemeToggle';
 import './Navbar.css';
 
 export default function Navbar() {
@@ -25,6 +26,7 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-actions">
+          <ThemeToggle />
           {isAuthenticated ? (
             <>
               <Link to="/app/dashboard">

@@ -24,7 +24,7 @@ const steps = [
 ];
 
 const languageOptions = [
-  'English', 'Spanish', 'French', 'German', 'Japanese',
+  'English', 'Tamil', 'Spanish', 'French', 'German', 'Japanese',
   'Mandarin Chinese', 'Portuguese', 'Hindi', 'Arabic', 'Russian', 'Italian', 'Korean'
 ];
 

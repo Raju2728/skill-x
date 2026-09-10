@@ -4,13 +4,14 @@
   justify-content: center;
   gap: var(--space-2);
   border: 1px solid transparent;
-  border-radius: var(--radius-md);
-  font-weight: var(--font-medium);
+  border-radius: var(--radius-lg);
+  font-weight: var(--font-semibold);
   white-space: nowrap;
   transition: all var(--transition-fast);
   position: relative;
   overflow: hidden;
   cursor: pointer;
+  font-family: var(--font-sans);
 }
 
 .btn:disabled {
@@ -23,32 +24,35 @@
 }
 
 /* Sizes */
-.btn-sm { padding: 6px 12px; font-size: var(--text-sm); border-radius: var(--radius-sm); }
-.btn-md { padding: 10px 20px; font-size: var(--text-sm); }
-.btn-lg { padding: 14px 28px; font-size: var(--text-base); border-radius: var(--radius-lg); }
+.btn-sm { padding: 8px 16px; font-size: var(--text-sm); border-radius: var(--radius-md); }
+.btn-md { padding: 10px 22px; font-size: var(--text-sm); }
+.btn-lg { padding: 14px 32px; font-size: var(--text-base); border-radius: var(--radius-xl); }
 
 .btn-full { width: 100%; }
 
 /* Primary */
 .btn-primary {
-  background: var(--accent-gradient);
+  background: var(--accent-primary);
   color: white;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(79, 110, 247, 0.25);
 }
 .btn-primary:not(:disabled):hover {
-  background: var(--accent-gradient-hover);
-  box-shadow: var(--shadow-glow);
+  background: var(--accent-primary-hover);
+  box-shadow: 0 4px 16px rgba(79, 110, 247, 0.35);
+  transform: translateY(-1px);
 }
 
 /* Secondary */
 .btn-secondary {
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   color: var(--text-primary);
   border-color: var(--border);
+  box-shadow: var(--shadow-sm);
 }
 .btn-secondary:not(:disabled):hover {
-  background: var(--bg-hover);
-  border-color: var(--border-light);
+  background: var(--bg-tertiary);
+  border-color: var(--accent-primary);
+  color: var(--accent-primary);
 }
 
 /* Ghost */
@@ -68,7 +72,7 @@
 }
 .btn-danger:not(:disabled):hover {
   background: #dc2626;
-  box-shadow: 0 0 20px rgba(239, 68, 68, 0.3);
+  box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
 }
 
 /* Outline */
@@ -79,6 +83,19 @@
 }
 .btn-outline:not(:disabled):hover {
   background: var(--accent-primary-muted);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Orange CTA */
+.btn-orange {
+  background: var(--accent-orange);
+  color: white;
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.25);
+}
+.btn-orange:not(:disabled):hover {
+  background: var(--accent-orange-hover);
+  box-shadow: 0 4px 16px rgba(255, 107, 53, 0.35);
+  transform: translateY(-1px);
 }
 
 /* Loading */

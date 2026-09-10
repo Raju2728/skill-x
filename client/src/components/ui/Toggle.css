@@ -1,59 +1,47 @@
+/* Toggle Switch */
 .toggle-wrapper {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--space-3);
   cursor: pointer;
 }
 
-.toggle-disabled { opacity: 0.5; cursor: not-allowed; }
-
-.toggle {
+.toggle-track {
   position: relative;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
+  width: 42px;
+  height: 24px;
+  background: var(--bg-active);
   border-radius: var(--radius-full);
-  transition: all var(--transition-fast);
+  transition: background var(--transition-fast);
+  flex-shrink: 0;
 }
 
-.toggle-sm { width: 36px; height: 20px; }
-.toggle-md { width: 44px; height: 24px; }
-.toggle-lg { width: 52px; height: 28px; }
-
-.toggle-input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-slider {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  background: var(--text-secondary);
-  border-radius: 50%;
-  transition: all var(--transition-fast);
-}
-
-.toggle-sm .toggle-slider { width: 14px; height: 14px; }
-.toggle-md .toggle-slider { width: 18px; height: 18px; }
-.toggle-lg .toggle-slider { width: 22px; height: 22px; }
-
-.toggle-checked {
+.toggle-track-checked {
   background: var(--accent-primary);
-  border-color: var(--accent-primary);
 }
 
-.toggle-checked .toggle-slider {
+.toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
   background: white;
+  border-radius: 50%;
+  transition: transform var(--transition-fast);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
 }
 
-.toggle-sm.toggle-checked .toggle-slider { transform: translateX(16px); }
-.toggle-md.toggle-checked .toggle-slider { transform: translateX(20px); }
-.toggle-lg.toggle-checked .toggle-slider { transform: translateX(24px); }
+.toggle-track-checked .toggle-thumb {
+  transform: translateX(18px);
+}
 
 .toggle-label {
   font-size: var(--text-sm);
-  color: var(--text-secondary);
-  user-select: none;
+  color: var(--text-primary);
+}
+
+.toggle-description {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
 }

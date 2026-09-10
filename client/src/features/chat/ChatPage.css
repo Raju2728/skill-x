@@ -1,12 +1,20 @@
+/* ==========================================================================
+   Skill X — Chat Page Layout & Partner Sidebar
+   Clean, responsive 3-column architecture
+   ========================================================================== */
+
 .chat-page-layout {
   display: flex;
-  height: calc(100vh - 40px);
+  height: calc(100vh - 100px);
   background: var(--bg-secondary);
   border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius-2xl);
   overflow: hidden;
+  box-shadow: var(--shadow-card);
+  position: relative;
 }
 
+/* Empty State / No Conversation Selected */
 .chat-no-selection {
   flex: 1;
   display: flex;
@@ -21,24 +29,29 @@
 .chat-no-selection h3 {
   font-size: var(--text-lg);
   font-weight: var(--font-semibold);
-  margin-bottom: var(--space-1);
+  color: var(--text-primary);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
 }
 
 .chat-no-selection p {
   font-size: var(--text-sm);
   color: var(--text-secondary);
-  max-width: 360px;
+  max-width: 380px;
+  line-height: var(--leading-normal);
 }
 
+/* Right-hand Partner Quick Profile Sidebar */
 .chat-partner-sidebar {
-  width: 260px;
+  width: 280px;
   background: var(--bg-secondary);
-  border-left: 1px solid var(--border);
-  padding: var(--space-5);
+  border-left: 1px solid var(--border-light);
+  padding: 24px 18px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: 20px;
   overflow-y: auto;
+  flex-shrink: 0;
 }
 
 .chat-sidebar-profile {
@@ -46,61 +59,69 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: var(--space-1);
+  padding: 16px 12px;
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-light);
 }
 
 .chat-sidebar-name {
-  font-size: var(--text-sm);
-  font-weight: var(--font-semibold);
-  margin-top: var(--space-2);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 10px;
+  margin-bottom: 2px;
 }
 
 .chat-sidebar-section {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
 }
 
 .chat-sidebar-heading {
   font-size: 11px;
-  font-weight: var(--font-semibold);
+  font-weight: 700;
   color: var(--text-tertiary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
+  margin: 0;
 }
 
 .chat-sidebar-bio {
   font-size: var(--text-xs);
   color: var(--text-secondary);
   line-height: var(--leading-normal);
+  background: var(--bg-primary);
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  margin: 0;
 }
 
 .chat-sidebar-actions {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
 }
 
-/* =============================
-   Mobile Chat Layout
-   ============================= */
+/* ==========================================================================
+   Mobile Responsive Chat Layout
+   ========================================================================== */
 @media (max-width: 768px) {
   .chat-page-layout {
-    /* Full height minus bottom nav */
     height: calc(100dvh - 88px);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
     border: none;
     margin: 0 calc(-1 * var(--space-3));
   }
 
-  /* Mobile: single panel takes full width */
   .chat-mobile > * {
     width: 100% !important;
     flex: 1 !important;
     min-width: 0 !important;
   }
 
-  /* Hide partner sidebar on mobile (handled in JSX) */
   .chat-partner-sidebar {
     display: none;
   }

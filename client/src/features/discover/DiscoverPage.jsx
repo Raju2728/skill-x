@@ -9,7 +9,7 @@ import Button from '../../components/ui/Button';
 import { PageLoader } from '../../components/ui/Spinner';
 import './DiscoverPage.css';
 
-const languageOptions = ['English', 'Spanish', 'French', 'German', 'Japanese', 'Mandarin Chinese'];
+const languageOptions = ['English', 'Tamil', 'Spanish', 'French', 'German', 'Japanese', 'Mandarin Chinese', 'Hindi'];
 const experienceOptions = [
   { value: '', label: 'All Levels' },
   { value: 'beginner', label: 'Beginner' },

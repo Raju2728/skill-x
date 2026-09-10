@@ -34,6 +34,7 @@ const initialSkills = [
   { name: 'Video Editing', category: 'Design & Creative', description: 'Premiere Pro / DaVinci Resolve storytelling and pacing', popularity: 83 },
 
   // Languages
+  { name: 'Tamil', category: 'Languages', description: 'Conversational Tamil, reading, grammar, and literature', popularity: 85 },
   { name: 'Spanish', category: 'Languages', description: 'Conversational and grammar Spanish from native/fluent speakers', popularity: 90 },
   { name: 'French', category: 'Languages', description: 'French pronunciation, idioms, and conversational mastery', popularity: 84 },
   { name: 'German', category: 'Languages', description: 'Grammar structures, technical and conversational German', popularity: 78 },

@@ -39,7 +39,13 @@ export default function ReviewsPage() {
   const totalReceived = receivedReviews.length;
   const avgRating = totalReceived > 0
     ? (receivedReviews.reduce((acc, r) => acc + r.overall, 0) / totalReceived).toFixed(1)
-    : '5.0';
+    : null;
+
+  const getCategoryAvg = (catKey) => {
+    if (totalReceived === 0) return '—';
+    const sum = receivedReviews.reduce((acc, r) => acc + (r.categories?.[catKey] || r.overall || 5), 0);
+    return `${(sum / totalReceived).toFixed(1)} / 5.0`;
+  };
 
   return (
     <div className="reviews-page animate-fade-in">
@@ -47,7 +53,7 @@ export default function ReviewsPage() {
         <div>
           <h1 className="reviews-title">Reviews & Community Standing</h1>
           <p className="reviews-subtitle">
-            Feedback and ratings from your skill exchange sessions.
+            Feedback and ratings from your verified peer skill exchange sessions.
           </p>
         </div>
       </div>
@@ -70,37 +76,41 @@ export default function ReviewsPage() {
       <div className="reviews-stats-card">
         <div className="reviews-stat-left">
           <div className="reviews-score-big">
-            <span className="score-num">{avgRating}</span>
+            <span className="score-num">{avgRating ? avgRating : 'New'}</span>
             <div className="score-stars">
               {[1, 2, 3, 4, 5].map(s => (
                 <Star
                   key={s}
                   size={16}
-                  fill={s <= Math.round(Number(avgRating)) ? '#f5a623' : 'none'}
-                  className="text-warning"
+                  fill={avgRating && s <= Math.round(Number(avgRating)) ? '#f5a623' : 'none'}
+                  className={avgRating ? 'text-warning' : 'text-tertiary'}
                 />
               ))}
             </div>
-            <span className="score-count">Based on {totalReceived} session reviews</span>
+            <span className="score-count">
+              {totalReceived > 0
+                ? `Based on ${totalReceived} verified session review${totalReceived > 1 ? 's' : ''}`
+                : 'No session reviews yet'}
+            </span>
           </div>
         </div>
 
         <div className="reviews-stat-breakdown">
           <div className="breakdown-item">
             <span>Knowledge & Expertise</span>
-            <strong>4.9 / 5.0</strong>
+            <strong>{getCategoryAvg('knowledge')}</strong>
           </div>
           <div className="breakdown-item">
             <span>Communication & Clarity</span>
-            <strong>4.8 / 5.0</strong>
+            <strong>{getCategoryAvg('communication')}</strong>
           </div>
           <div className="breakdown-item">
             <span>Punctuality & Reliability</span>
-            <strong>5.0 / 5.0</strong>
+            <strong>{getCategoryAvg('punctuality')}</strong>
           </div>
           <div className="breakdown-item">
             <span>Helpfulness & Patience</span>
-            <strong>4.9 / 5.0</strong>
+            <strong>{getCategoryAvg('helpfulness')}</strong>
           </div>
         </div>
       </div>

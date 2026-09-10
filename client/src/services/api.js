@@ -89,7 +89,8 @@ export const userAPI = {
   updateProfile: (data) => api.put('/users/profile', data),
   uploadAvatar: (file) => {
     const formData = new FormData();
-    formData.append('avatar', file);
+    const fileName = file instanceof File ? file.name : 'avatar.jpg';
+    formData.append('avatar', file, fileName);
     return api.post('/users/avatar', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });

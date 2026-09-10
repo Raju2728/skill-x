@@ -1,23 +1,35 @@
+/* Skeleton loading */
 .skeleton {
-  background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-elevated) 50%, var(--bg-tertiary) 75%);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--bg-hover) 50%,
+    transparent 100%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
 }
 
-.skeleton-r-sm { border-radius: var(--radius-sm); }
-.skeleton-r-md { border-radius: var(--radius-md); }
-.skeleton-r-lg { border-radius: var(--radius-lg); }
-.skeleton-r-full { border-radius: var(--radius-full); }
-
 .skeleton-text {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  height: 14px;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-circle {
+  border-radius: 50%;
 }
 
 .skeleton-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
+  border-radius: var(--radius-2xl);
+  height: 200px;
 }

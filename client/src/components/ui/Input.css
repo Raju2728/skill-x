@@ -1,96 +1,180 @@
+/* ===========================
+   Input Component — Professional Design
+   =========================== */
+
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 6px;
+  width: 100%;
 }
 
-.input-full { width: 100%; }
+.input-full {
+  width: 100%;
+}
 
 .input-label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-size: var(--text-sm);
   font-weight: var(--font-medium);
-  color: var(--text-secondary);
+  color: var(--text-primary);
+  line-height: 1.2;
 }
 
 .input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
-}
-
-.input {
   width: 100%;
-  padding: 10px 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  transition: all var(--transition-fast);
-}
-
-.input::placeholder {
-  color: var(--text-tertiary);
-}
-
-.input:hover {
-  border-color: var(--border-light);
-}
-
-.input:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-primary-muted);
-}
-
-.input-with-icon {
-  padding-left: 40px;
-}
-
-.input-with-toggle {
-  padding-right: 40px;
 }
 
 .input-icon {
   position: absolute;
-  left: 12px;
-  color: var(--text-tertiary);
+  left: 13px;
   display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
   pointer-events: none;
+  transition: color var(--transition-fast), transform var(--transition-fast);
+  z-index: 2;
 }
 
-.input-toggle {
+.input,
+.input-field {
+  width: 100%;
+  height: 44px;
+  padding: 10px 14px;
+  background: var(--input-bg, var(--bg-primary));
+  border: 1.5px solid var(--input-border, var(--border));
+  border-radius: var(--radius-lg);
+  color: var(--input-text, var(--text-primary));
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  line-height: var(--leading-normal);
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.input::placeholder,
+.input-field::placeholder {
+  color: var(--input-placeholder, var(--text-tertiary));
+  font-size: var(--text-sm);
+  opacity: 0.85;
+}
+
+.input:hover,
+.input-field:hover {
+  border-color: var(--input-border-hover, var(--border));
+  background: var(--input-bg, var(--bg-primary));
+  color: var(--input-text, var(--text-primary));
+}
+
+.input:focus,
+.input-field:focus {
+  border-color: var(--input-border-focus, var(--accent-primary));
+  background: var(--input-bg-focus, var(--bg-primary));
+  color: var(--input-text, var(--text-primary));
+  box-shadow: 0 0 0 3.5px var(--accent-primary-muted);
+}
+
+/* Chrome/Edge/Safari Autofill */
+.input:-webkit-autofill,
+.input:-webkit-autofill:hover,
+.input:-webkit-autofill:focus,
+.input:-webkit-autofill:active,
+.input-field:-webkit-autofill,
+.input-field:-webkit-autofill:hover,
+.input-field:-webkit-autofill:focus,
+.input-field:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--input-text, var(--text-primary)) !important;
+  -webkit-box-shadow: 0 0 0px 1000px var(--input-bg, var(--bg-primary)) inset !important;
+  box-shadow: 0 0 0px 1000px var(--input-bg, var(--bg-primary)) inset !important;
+  transition: background-color 5000s ease-in-out 0s !important;
+}
+
+.input-wrapper:focus-within .input-icon {
+  color: var(--accent-primary);
+}
+
+/* With icon padding */
+.input.input-with-icon,
+.input-field.input-with-icon,
+.input-wrapper:has(.input-icon) .input,
+.input-wrapper:has(.input-icon) .input-field {
+  padding-left: 42px;
+}
+
+/* With password toggle button padding */
+.input.input-with-toggle,
+.input-field.input-with-toggle,
+.input-wrapper:has(.input-toggle) .input,
+.input-wrapper:has(.input-toggle-btn) .input,
+.input-wrapper:has(.input-toggle) .input-field,
+.input-wrapper:has(.input-toggle-btn) .input-field {
+  padding-right: 44px;
+}
+
+/* Toggle visibility button */
+.input-toggle,
+.input-toggle-btn {
   position: absolute;
   right: 8px;
-  padding: 4px;
-  color: var(--text-tertiary);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  color: var(--text-tertiary);
   cursor: pointer;
-  background: none;
+  background: transparent;
   border: none;
-  border-radius: var(--radius-sm);
-  transition: color var(--transition-fast);
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+  z-index: 2;
 }
 
-.input-toggle:hover {
-  color: var(--text-secondary);
+.input-toggle:hover,
+.input-toggle-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
 }
 
-/* Error */
-.input-error .input {
+/* Error State */
+.input-error .input,
+.input-error .input-field {
   border-color: var(--danger);
+  background: rgba(239, 68, 68, 0.02);
 }
 
-.input-error .input:focus {
-  box-shadow: 0 0 0 3px var(--danger-muted);
+.input-error .input:focus,
+.input-error .input-field:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3.5px var(--danger-muted);
 }
 
 .input-error-text {
   font-size: var(--text-xs);
+  font-weight: var(--font-medium);
   color: var(--danger);
+  margin-top: 2px;
+  line-height: 1.3;
 }
 
 .input-hint {
   font-size: var(--text-xs);
   color: var(--text-tertiary);
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* Disabled state */
+.input:disabled,
+.input-field:disabled {
+  background: var(--bg-tertiary);
+  color: var(--text-tertiary);
+  cursor: not-allowed;
+  opacity: 0.7;
 }

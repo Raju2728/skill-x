@@ -4,12 +4,13 @@
 
 .app-layout {
   min-height: 100vh;
+  background: var(--bg-primary);
 }
 
 /* margin-left is controlled via inline style in AppLayout.jsx
    so it's always in sync with the React sidebarCollapsed state */
 .app-main {
-  padding: var(--space-6);
+  padding: var(--space-6) var(--space-8);
   min-height: 100vh;
   box-sizing: border-box;
   overflow-x: hidden;
@@ -18,6 +19,14 @@
 .public-main {
   padding-top: var(--navbar-height);
   min-height: 100vh;
+}
+
+/* Tablet — content adjusts to collapsed sidebar */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .app-main {
+    margin-left: var(--sidebar-collapsed-width) !important;
+    padding: var(--space-5) var(--space-6);
+  }
 }
 
 @media (max-width: 768px) {

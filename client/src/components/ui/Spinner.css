@@ -1,30 +1,243 @@
-.spinner {
-  display: inline-flex;
-  color: var(--accent-primary);
-}
+/* ==========================================================================
+   Skill X — Proprietary Orbital Loading Animation
+   Unique, futuristic, dual-concentric orbits + luminous 'X' core
+   ========================================================================== */
 
-.spinner-sm { width: 16px; height: 16px; }
-.spinner-md { width: 24px; height: 24px; }
-.spinner-lg { width: 40px; height: 40px; }
-.spinner-xl { width: 56px; height: 56px; }
-
-.spinner-svg {
-  width: 100%;
-  height: 100%;
-  animation: spin 1s linear infinite;
-}
-
-.spinner-track {
-  opacity: 0.15;
-}
-
-.spinner-head {
-  opacity: 1;
-}
-
-.page-loader {
+/* Full Page Loader */
+.skillx-page-loader {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   min-height: 60vh;
+  gap: 24px;
+  user-select: none;
+}
+
+.skillx-loader-container {
+  position: relative;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Luminous Glow Halo */
+.skillx-loader-halo {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79, 110, 247, 0.28) 0%, rgba(124, 92, 191, 0.12) 50%, transparent 70%);
+  animation: skillx-pulse-halo 2.4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Outer Orbital Ring (Clockwise) */
+.skillx-orbital-ring.ring-outer {
+  position: absolute;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  border: 2px dashed rgba(79, 110, 247, 0.35);
+  animation: skillx-spin-cw 6s linear infinite;
+}
+
+/* Inner Counter-Orbital Ring (Counter-Clockwise) */
+.skillx-orbital-ring.ring-inner {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: #7c5cbf;
+  border-bottom-color: #ff6b35;
+  animation: skillx-spin-ccw 2.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Orbital Satellites */
+.orbital-node {
+  position: absolute;
+  border-radius: 50%;
+  box-shadow: 0 0 10px currentColor;
+}
+
+.node-1 {
+  top: -4px;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin-left: -4px;
+  background: #4f6ef7;
+  color: #4f6ef7;
+}
+
+.node-2 {
+  bottom: -4px;
+  left: 50%;
+  width: 6px;
+  height: 6px;
+  margin-left: -3px;
+  background: #7c5cbf;
+  color: #7c5cbf;
+}
+
+.node-3 {
+  top: -3px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  margin-left: -3.5px;
+  background: #ff6b35;
+  color: #ff6b35;
+}
+
+/* Central Luminous 'X' Emblem */
+.skillx-central-x {
+  position: relative;
+  z-index: 2;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: skillx-x-pulse 2s ease-in-out infinite alternate;
+  filter: drop-shadow(0 2px 8px rgba(79, 110, 247, 0.4));
+}
+
+.skillx-x-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.x-path {
+  stroke-dasharray: 40;
+  animation: skillx-x-draw 1.8s ease-in-out infinite alternate;
+}
+
+.x-path-2 {
+  animation-delay: 0.25s;
+}
+
+/* Brand Typography & Status */
+.skillx-loader-text-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.skillx-loader-brand {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text-primary);
+}
+
+.skillx-gradient-x {
+  background: linear-gradient(135deg, #4f6ef7 0%, #7c5cbf 50%, #ff6b35 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  font-size: 1.35rem;
+  margin-left: 2px;
+}
+
+.skillx-loader-status {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  font-weight: 600;
+  animation: skillx-status-pulse 1.8s ease-in-out infinite alternate;
+}
+
+/* ==========================================================================
+   Inline Lightweight Skill X Spinner
+   ========================================================================== */
+
+.skillx-spinner {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.skillx-spinner-sm { width: 18px; height: 18px; }
+.skillx-spinner-md { width: 24px; height: 24px; }
+.skillx-spinner-lg { width: 36px; height: 36px; }
+
+.skillx-spinner-orbit-outer {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--accent-primary);
+  border-right-color: var(--accent-secondary);
+  animation: skillx-spin-cw 0.75s linear infinite;
+}
+
+.skillx-spinner-orbit-inner {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  border-bottom-color: var(--accent-orange);
+  animation: skillx-spin-ccw 0.5s linear infinite;
+}
+
+.skillx-spinner-core-x {
+  position: relative;
+  width: 50%;
+  height: 50%;
+}
+
+.skillx-spinner-core-x .x-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+}
+
+.skillx-spinner-core-x .x-line-1 { transform: translateY(-50%) rotate(45deg); }
+.skillx-spinner-core-x .x-line-2 { transform: translateY(-50%) rotate(-45deg); }
+
+/* ==========================================================================
+   Keyframe Animations
+   ========================================================================== */
+
+@keyframes skillx-spin-cw {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes skillx-spin-ccw {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+@keyframes skillx-pulse-halo {
+  0% { transform: scale(0.9); opacity: 0.3; }
+  100% { transform: scale(1.2); opacity: 0.75; }
+}
+
+@keyframes skillx-x-pulse {
+  0% { transform: scale(0.92); filter: drop-shadow(0 0 4px rgba(79, 110, 247, 0.4)); }
+  100% { transform: scale(1.08); filter: drop-shadow(0 0 14px rgba(124, 92, 191, 0.7)); }
+}
+
+@keyframes skillx-x-draw {
+  0% { stroke-dashoffset: 20; opacity: 0.6; }
+  100% { stroke-dashoffset: 0; opacity: 1; }
+}
+
+@keyframes skillx-status-pulse {
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
 }

@@ -96,6 +96,42 @@ export default function MessageBubble({
     );
   }
 
+  const handleDownloadAttachment = async (e) => {
+    e.preventDefault();
+    const fileUrl = message.fileMetadata?.fileUrl || message.fileMetadata?.url;
+    const fileName = message.fileMetadata?.fileName || message.fileMetadata?.originalName || 'download';
+    if (!fileUrl) return;
+
+    try {
+      const rawFileName = fileUrl.split('/').pop()?.split('?')[0];
+      const downloadEndpoint = rawFileName
+        ? `/api/files/download/${rawFileName}?name=${encodeURIComponent(fileName)}`
+        : fileUrl;
+
+      const res = await fetch(downloadEndpoint);
+      if (!res.ok) throw new Error('Download request failed');
+
+      const blob = await res.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const tempLink = document.createElement('a');
+      tempLink.href = blobUrl;
+      tempLink.download = fileName;
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      window.URL.revokeObjectURL(blobUrl);
+      document.body.removeChild(tempLink);
+    } catch (err) {
+      console.error('Blob download failed, falling back to direct link:', err);
+      const fallbackLink = document.createElement('a');
+      fallbackLink.href = fileUrl;
+      fallbackLink.download = fileName;
+      fallbackLink.target = '_blank';
+      document.body.appendChild(fallbackLink);
+      fallbackLink.click();
+      document.body.removeChild(fallbackLink);
+    }
+  };
+
   return (
     <div className={`message-bubble-row ${isOwn ? 'msg-row-own' : 'msg-row-partner'}`}>
       <div className={`message-bubble ${isOwn ? 'msg-bubble-own' : 'msg-bubble-partner'} animate-scale-in`}>
@@ -111,17 +147,16 @@ export default function MessageBubble({
                 {message.fileMetadata?.fileSize ? `${(message.fileMetadata.fileSize / 1024).toFixed(1)} KB` : 'File'}
               </span>
             </div>
-            {message.fileMetadata?.fileUrl && (
-              <a
-                href={message.fileMetadata.fileUrl}
-                download
-                target="_blank"
-                rel="noreferrer"
+            {(message.fileMetadata?.fileUrl || message.fileMetadata?.url) && (
+              <button
+                type="button"
+                onClick={handleDownloadAttachment}
                 className="msg-file-download-btn"
                 aria-label="Download attachment"
+                title={`Download ${message.fileMetadata?.fileName || 'file'}`}
               >
                 <Download size={16} />
-              </a>
+              </button>
             )}
           </div>
         ) : message.messageType === 'voice' ? (

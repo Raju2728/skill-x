@@ -29,16 +29,20 @@ img, picture, video, canvas, svg {
   max-width: 100%;
 }
 
-input, button, textarea, select {
+button {
   font: inherit;
   color: inherit;
-}
-
-button {
   cursor: pointer;
   border: none;
   background: none;
 }
+
+input, textarea, select {
+  font: inherit;
+  color: var(--input-text, var(--text-primary));
+  background-color: var(--input-bg, var(--bg-primary));
+}
+
 
 a {
   color: inherit;

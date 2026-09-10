@@ -2,12 +2,13 @@
    Skill X — Global Styles
    =========================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
 
 body {
   font-family: var(--font-sans);
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  transition: background-color var(--transition-base), color var(--transition-base);
 }
 
 /* --- Selection --- */
@@ -34,7 +35,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--border-light);
+  background: var(--border);
   border-radius: var(--radius-full);
 }
 
@@ -45,7 +46,7 @@ body {
 /* Firefox scrollbar */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--border-light) transparent;
+  scrollbar-color: var(--border) transparent;
 }
 
 /* --- Links --- */
@@ -54,8 +55,12 @@ a:hover {
 }
 
 /* --- Headings --- */
-h1 { font-size: var(--text-4xl); font-weight: var(--font-bold); }
-h2 { font-size: var(--text-3xl); font-weight: var(--font-bold); }
+h1, h2, h3 {
+  font-family: var(--font-display);
+}
+
+h1 { font-size: var(--text-4xl); font-weight: var(--font-bold); letter-spacing: -0.02em; }
+h2 { font-size: var(--text-3xl); font-weight: var(--font-bold); letter-spacing: -0.01em; }
 h3 { font-size: var(--text-2xl); font-weight: var(--font-semibold); }
 h4 { font-size: var(--text-xl); font-weight: var(--font-semibold); }
 h5 { font-size: var(--text-lg); font-weight: var(--font-medium); }
@@ -97,23 +102,60 @@ hr {
 .setup-textarea {
   width: 100%;
   padding: 10px 14px;
-  background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  color: var(--text-primary);
+  background: var(--input-bg, var(--bg-primary));
+  border: 1.5px solid var(--input-border, var(--border));
+  border-radius: var(--radius-lg);
+  color: var(--input-text, var(--text-primary));
   font-size: var(--text-sm);
   font-family: var(--font-sans);
   line-height: var(--leading-normal);
   resize: vertical;
-  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .setup-textarea::placeholder {
-  color: var(--text-tertiary);
+  color: var(--input-placeholder, var(--text-tertiary));
+}
+
+.setup-textarea:hover {
+  border-color: var(--input-border-hover, var(--border));
 }
 
 .setup-textarea:focus {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px var(--accent-primary-muted);
+  background: var(--input-bg-focus, var(--bg-primary));
+  color: var(--input-text, var(--text-primary));
+  border-color: var(--input-border-focus, var(--accent-primary));
+  box-shadow: 0 0 0 3.5px var(--accent-primary-muted);
+}
+
+/* --- Accent secondary text util --- */
+.text-accent-secondary {
+  color: var(--accent-secondary);
+}
+
+/* --- Fill utils --- */
+.fill-warning {
+  fill: var(--warning);
+}
+
+/* =======================================================
+   Skill X Signature — Slanted 'X' Sparkles
+   Transforms default sparkles into a distinct 'X' emblem
+   ======================================================= */
+svg.lucide-sparkles,
+.lucide-sparkles {
+  transform: rotate(25deg);
+  display: inline-block;
+  transition: transform var(--transition-fast), filter var(--transition-fast);
+}
+
+button:hover svg.lucide-sparkles,
+.btn:hover svg.lucide-sparkles,
+a:hover svg.lucide-sparkles,
+button:hover .lucide-sparkles,
+.btn:hover .lucide-sparkles,
+a:hover .lucide-sparkles {
+  transform: rotate(45deg) scale(1.15);
+  filter: drop-shadow(0 0 5px rgba(79, 110, 247, 0.45));
 }

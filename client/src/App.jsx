@@ -34,6 +34,8 @@ const ReviewsPage = lazy(() => import('./features/reviews/ReviewsPage'));
 const LearningPage = lazy(() => import('./features/learning/LearningPage'));
 const AdminDashboard = lazy(() => import('./features/admin/AdminDashboard'));
 
+import { ThemeProvider } from './contexts/ThemeContext';
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -47,13 +49,14 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <SocketProvider>
-            <ToastProvider>
-              <IncomingCallModal />
-              <Suspense fallback={<PageLoader />}>
-                <Routes>
+      <ThemeProvider>
+        <BrowserRouter>
+          <AuthProvider>
+            <SocketProvider>
+              <ToastProvider>
+                <IncomingCallModal />
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
                   {/* Public Landing */}
                   <Route element={<PublicLayout />}>
                     <Route path="/" element={<LandingPage />} />
@@ -116,6 +119,7 @@ export default function App() {
           </SocketProvider>
         </AuthProvider>
       </BrowserRouter>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }

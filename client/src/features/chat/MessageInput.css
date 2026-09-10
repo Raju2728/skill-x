@@ -1,25 +1,37 @@
+/* ==========================================================================
+   Skill X — Chat Message Input Styles
+   Modern pill container with smooth expansion and interactive controls
+   ========================================================================== */
+
 .message-input-form {
-  padding: var(--space-3) var(--space-4);
   background: var(--bg-secondary);
-  border-top: 1px solid var(--border);
+  border-top: 1px solid var(--border-light);
+  padding: 12px 18px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 8px;
+  flex-shrink: 0;
 }
 
+/* File Preview Attachment Bar */
 .file-preview-bar {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 8px;
+  padding: 6px 12px;
   background: var(--bg-tertiary);
-  padding: var(--space-2) var(--space-3);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
   font-size: var(--text-xs);
+  color: var(--text-secondary);
+  width: fit-content;
+  max-width: 100%;
 }
 
 .file-preview-name {
-  font-weight: var(--font-medium);
-  max-width: 250px;
+  font-weight: 600;
+  color: var(--text-primary);
+  max-width: 240px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -27,116 +39,126 @@
 
 .file-preview-size {
   color: var(--text-tertiary);
+  font-size: 11px;
 }
 
 .file-preview-remove {
-  margin-left: auto;
-  background: none;
   border: none;
-  color: var(--text-tertiary);
+  background: transparent;
   cursor: pointer;
+  color: var(--text-tertiary);
+  border-radius: 50%;
+  padding: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition-fast);
 }
 
 .file-preview-remove:hover {
   color: var(--danger);
 }
 
+/* Modern Input Pill Bar */
 .message-input-bar {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 8px;
   background: var(--bg-tertiary);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-xl);
-  padding: 4px var(--space-2);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-2xl);
+  padding: 5px 6px 5px 12px;
   transition: all var(--transition-fast);
 }
 
 .message-input-bar:focus-within {
   border-color: var(--accent-primary);
-  box-shadow: 0 0 0 2px var(--accent-primary-muted);
+  box-shadow: 0 0 0 3px var(--accent-primary-muted);
+  background: var(--bg-secondary);
 }
 
+/* Tool Buttons (Attachment, etc.) */
 .msg-tool-btn {
-  background: none;
-  border: none;
-  color: var(--text-tertiary);
-  cursor: pointer;
-  padding: var(--space-2);
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color var(--transition-fast);
-}
-
-.msg-tool-btn:hover {
-  color: var(--text-primary);
-  background: var(--bg-hover);
-}
-
-.msg-textarea {
-  flex: 1;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
   background: transparent;
   border: none;
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  padding: 8px 4px;
-  resize: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.msg-tool-btn:hover:not(:disabled) {
+  color: var(--accent-primary);
+  background: var(--accent-primary-muted);
+}
+
+.msg-tool-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Borderless Auto-sizing Textarea */
+.msg-textarea {
+  flex: 1;
+  min-width: 0;
+  min-height: 24px;
   max-height: 120px;
+  border: none;
+  background: transparent;
+  resize: none;
   outline: none;
+  font-size: var(--text-sm);
+  line-height: 1.45;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  padding: 6px 4px;
 }
 
 .msg-textarea::placeholder {
   color: var(--text-tertiary);
 }
 
+/* Rounded Floating Send Button */
 .msg-send-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--accent-gradient);
-  color: white;
-  border: none;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #ffffff;
+  border: none;
+  cursor: pointer;
   transition: all var(--transition-fast);
   flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(79, 110, 247, 0.3);
+}
+
+.msg-send-btn:hover:not(:disabled) {
+  background: var(--accent-primary-hover);
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(79, 110, 247, 0.4);
 }
 
 .msg-send-btn:disabled {
-  opacity: 0.4;
+  opacity: 0.35;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+  background: var(--text-tertiary);
 }
 
-.msg-send-btn:not(:disabled):hover {
-  box-shadow: var(--shadow-glow);
-  transform: scale(1.05);
-}
-
-/* =============================
-   Mobile MessageInput
-   ============================= */
+/* Mobile Adjustments */
 @media (max-width: 768px) {
   .message-input-form {
-    padding: var(--space-2) var(--space-3);
-    padding-bottom: max(var(--space-2), env(safe-area-inset-bottom));
-  }
-
-  .msg-tool-btn {
-    padding: var(--space-3);
-    min-width: 40px;
-    min-height: 40px;
-  }
-
-  .msg-send-btn {
-    width: 40px;
-    height: 40px;
-  }
-
-  .msg-textarea {
-    font-size: 16px; /* prevents iOS zoom on focus */
+    padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   }
 }

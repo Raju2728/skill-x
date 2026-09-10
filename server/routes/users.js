@@ -1,4 +1,7 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 const { requireAuth, optionalAuth } = require('../middleware/auth');
 const User = require('../models/User');
 const UserSkill = require('../models/UserSkill');
@@ -7,6 +10,35 @@ const Availability = require('../models/Availability');
 const Review = require('../models/Review');
 const { escapeRegex } = require('../utils/sanitize');
 const router = express.Router();
+
+// Ensure upload directory exists
+const uploadDir = path.join(__dirname, '../uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const avatarStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    const ext = path.extname(file.originalname).toLowerCase() || '.jpg';
+    cb(null, `avatar-${uniqueSuffix}${ext}`);
+  },
+});
+
+const avatarUpload = multer({
+  storage: avatarStorage,
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+    if (!allowed.includes(file.mimetype)) {
+      return cb(new Error('Only image files (JPG, PNG, WEBP, GIF) are allowed for profile photo'));
+    }
+    cb(null, true);
+  },
+});
 
 // Get user public profile with skills, ratings, and availability
 router.get('/:id', optionalAuth, async (req, res, next) => {
@@ -82,6 +114,34 @@ router.put('/profile', requireAuth, async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+});
+
+// Upload and set user avatar
+router.post('/avatar', requireAuth, (req, res, next) => {
+  avatarUpload.single('avatar')(req, res, async (err) => {
+    if (err) {
+      return res.status(400).json({ message: err.message || 'Avatar upload failed' });
+    }
+    if (!req.file) {
+      return res.status(400).json({ message: 'No image file uploaded' });
+    }
+
+    try {
+      const avatarUrl = `/uploads/${req.file.filename}`;
+      const user = await User.findByIdAndUpdate(
+        req.user._id,
+        { $set: { avatar: avatarUrl } },
+        { new: true, runValidators: true }
+      );
+      res.json({
+        message: 'Profile photo updated successfully',
+        avatarUrl,
+        user,
+      });
+    } catch (dbErr) {
+      next(dbErr);
+    }
+  });
 });
 
 // Get user skills

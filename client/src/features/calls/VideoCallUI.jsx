@@ -27,6 +27,7 @@ export default function VideoCallUI({
   const [callDuration, setCallDuration] = useState(0);
   const [callStatus, setCallStatus] = useState('Connecting...');
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const hasEndedRef = useRef(false);
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -49,6 +50,10 @@ export default function VideoCallUI({
           setCallStatus('Connected');
           if (remoteVideoRef.current) {
             remoteVideoRef.current.srcObject = stream;
+            // Explicitly play remote video to overcome browser autoplay policies
+            remoteVideoRef.current.play().catch((err) => {
+              console.warn('Remote video autoplay blocked, will retry on interaction:', err);
+            });
           }
           if (!timer) {
             timer = setInterval(() => {
@@ -81,7 +86,10 @@ export default function VideoCallUI({
 
     return () => {
       if (timer) clearInterval(timer);
-      webRTCManager.closeCall();
+      // Only close call on unmount if we haven't already ended it via button
+      if (!hasEndedRef.current) {
+        webRTCManager.closeCall();
+      }
     };
   }, [partner._id, isIncoming, callId, onEndCall]);
 
@@ -123,6 +131,14 @@ export default function VideoCallUI({
     }
   };
 
+  // Explicitly end the call — emits call:end to server so both users disconnect
+  const handleEndCall = () => {
+    if (hasEndedRef.current) return;
+    hasEndedRef.current = true;
+    webRTCManager.closeCall(true); // true = notify socket
+    onEndCall?.();
+  };
+
   const formatTimer = (seconds) => {
     const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
     const secs = (seconds % 60).toString().padStart(2, '0');
@@ -138,6 +154,10 @@ export default function VideoCallUI({
           autoPlay
           playsInline
           className="video-call-remote-video"
+          onLoadedMetadata={(e) => {
+            // Ensure playback starts when metadata is available
+            e.target.play().catch(() => {});
+          }}
         />
 
         {callStatus !== 'Connected' && (
@@ -229,7 +249,7 @@ export default function VideoCallUI({
         <button
           type="button"
           className="video-ctrl-btn-end"
-          onClick={onEndCall}
+          onClick={handleEndCall}
           title="End Video Call"
           aria-label="End call"
         >
